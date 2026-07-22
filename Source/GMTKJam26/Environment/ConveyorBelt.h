@@ -8,6 +8,18 @@ class UStaticMeshComponent;
 class UBoxComponent;
 class AInteractableItem;
 
+USTRUCT(BlueprintType)
+struct FConveyorSpawnEntry
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conveyor|Spawning")
+	TSubclassOf<AInteractableItem> ItemClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conveyor|Spawning", meta = (ClampMin = "0.0"))
+	float SpawnWeight = 1.f;
+};
+
 UCLASS()
 class GMTKJAM26_API AConveyorBelt : public AActor
 {
@@ -17,6 +29,12 @@ public:
 	AConveyorBelt();
 
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Conveyor|Spawning")
+	void EnableSpawning();
+
+	UFUNCTION(BlueprintCallable, Category = "Conveyor|Spawning")
+	void DisableSpawning();
 
 protected:
 	virtual void BeginPlay() override;
@@ -33,14 +51,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conveyor")
 	float ConveyorSpeed = 300.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conveyor|Spawning")
-	TSubclassOf<AInteractableItem> ItemClassToSpawn;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conveyor")
+	float ConveyorAcceleration = 2000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conveyor|Spawning")
-	float SpawnInterval = 3.f;
+	TArray<FConveyorSpawnEntry> ItemsToSpawn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conveyor|Spawning", meta = (ClampMin = "0.0"))
+	float MinSpawnInterval = 2.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conveyor|Spawning", meta = (ClampMin = "0.0"))
+	float MaxSpawnInterval = 5.f;
 
 private:
 	void SpawnItem();
+	void ScheduleNextSpawn();
+	TSubclassOf<AInteractableItem> PickRandomItemClass() const;
 
 	FTimerHandle SpawnTimerHandle;
+	bool bSpawningEnabled = true;
 };

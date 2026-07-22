@@ -26,10 +26,37 @@ void AConveyorBelt::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (ItemClassToSpawn)
+	if (bSpawningEnabled && ItemsToSpawn.Num() > 0)
 	{
-		GetWorldTimerManager().SetTimer(SpawnTimerHandle, this, &AConveyorBelt::SpawnItem, SpawnInterval, true);
+		ScheduleNextSpawn();
 	}
+}
+
+void AConveyorBelt::EnableSpawning()
+{
+	if (bSpawningEnabled)
+	{
+		return;
+	}
+
+	bSpawningEnabled = true;
+
+	if (ItemsToSpawn.Num() > 0 && !GetWorldTimerManager().IsTimerActive(SpawnTimerHandle))
+	{
+		ScheduleNextSpawn();
+	}
+}
+
+void AConveyorBelt::DisableSpawning()
+{
+	bSpawningEnabled = false;
+	GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
+}
+
+void AConveyorBelt::ScheduleNextSpawn()
+{
+	const float Interval = FMath::FRandRange(FMath::Max(MinSpawnInterval, 0.f), FMath::Max(MaxSpawnInterval, MinSpawnInterval));
+	GetWorldTimerManager().SetTimer(SpawnTimerHandle, this, &AConveyorBelt::SpawnItem, Interval, false);
 }
 
 void AConveyorBelt::Tick(float DeltaTime)
@@ -57,7 +84,11 @@ void AConveyorBelt::Tick(float DeltaTime)
 		if (RootPrimitive && RootPrimitive->IsSimulatingPhysics())
 		{
 			const FVector CurrentVelocity = RootPrimitive->GetPhysicsLinearVelocity();
-			RootPrimitive->SetPhysicsLinearVelocity(FVector(BeltVelocity.X, BeltVelocity.Y, CurrentVelocity.Z));
+			const FVector CurrentXY(CurrentVelocity.X, CurrentVelocity.Y, 0.f);
+			const FVector TargetXY(BeltVelocity.X, BeltVelocity.Y, 0.f);
+
+			const FVector NewXY = FMath::VInterpConstantTo(CurrentXY, TargetXY, DeltaTime, ConveyorAcceleration);
+			RootPrimitive->SetPhysicsLinearVelocity(FVector(NewXY.X, NewXY.Y, CurrentVelocity.Z));
 		}
 		else
 		{
@@ -68,13 +99,51 @@ void AConveyorBelt::Tick(float DeltaTime)
 
 void AConveyorBelt::SpawnItem()
 {
-	if (!ItemClassToSpawn || !SpawnPoint)
+	TSubclassOf<AInteractableItem> ChosenClass = PickRandomItemClass();
+	if (ChosenClass && SpawnPoint)
 	{
-		return;
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		GetWorld()->SpawnActor<AInteractableItem>(ChosenClass, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation(), SpawnParams);
 	}
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	if (bSpawningEnabled && ItemsToSpawn.Num() > 0)
+	{
+		ScheduleNextSpawn();
+	}
+}
 
-	GetWorld()->SpawnActor<AInteractableItem>(ItemClassToSpawn, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation(), SpawnParams);
+TSubclassOf<AInteractableItem> AConveyorBelt::PickRandomItemClass() const
+{
+	float TotalWeight = 0.f;
+	for (const FConveyorSpawnEntry& Entry : ItemsToSpawn)
+	{
+		if (Entry.ItemClass)
+		{
+			TotalWeight += FMath::Max(Entry.SpawnWeight, 0.f);
+		}
+	}
+
+	if (TotalWeight <= 0.f)
+	{
+		return nullptr;
+	}
+
+	float Roll = FMath::FRandRange(0.f, TotalWeight);
+	for (const FConveyorSpawnEntry& Entry : ItemsToSpawn)
+	{
+		if (!Entry.ItemClass)
+		{
+			continue;
+		}
+
+		Roll -= FMath::Max(Entry.SpawnWeight, 0.f);
+		if (Roll <= 0.f)
+		{
+			return Entry.ItemClass;
+		}
+	}
+
+	return ItemsToSpawn.Last().ItemClass;
 }
