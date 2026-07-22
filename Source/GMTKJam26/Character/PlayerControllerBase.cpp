@@ -48,7 +48,6 @@ void APlayerControllerBase::OnPossess(APawn* InPawn)
 
 	ControlledCharacter = Cast<APlayerCharacter>(InPawn);
 
-	// Both players share the same hand-placed static camera in the level.
 	if (AActor* StaticCamera = UGameplayStatics::GetActorOfClass(GetWorld(), ATopDownCameraActor::StaticClass()))
 	{
 		SetViewTarget(StaticCamera);
