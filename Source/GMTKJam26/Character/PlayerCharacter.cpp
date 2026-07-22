@@ -1,6 +1,8 @@
 #include "PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/DashComponent.h"
+#include "Components/PickupComponent.h"
+#include "Components/ThrowComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -17,6 +19,8 @@ APlayerCharacter::APlayerCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 
 	DashComponent = CreateDefaultSubobject<UDashComponent>(TEXT("DashComponent"));
+	PickupComponent = CreateDefaultSubobject<UPickupComponent>(TEXT("PickupComponent"));
+	ThrowComponent = CreateDefaultSubobject<UThrowComponent>(TEXT("ThrowComponent"));
 }
 
 void APlayerCharacter::BeginPlay()
@@ -45,5 +49,33 @@ void APlayerCharacter::RequestDash()
 	if (DashComponent)
 	{
 		DashComponent->StartDash();
+	}
+}
+
+void APlayerCharacter::RequestInteract()
+{
+	if (!PickupComponent)
+	{
+		return;
+	}
+
+	if (PickupComponent->IsHoldingItem())
+	{
+		if (ThrowComponent)
+		{
+			ThrowComponent->ThrowHeldItem();
+		}
+	}
+	else
+	{
+		PickupComponent->TryPickup();
+	}
+}
+
+void APlayerCharacter::RequestDrop()
+{
+	if (PickupComponent)
+	{
+		PickupComponent->DropItem();
 	}
 }

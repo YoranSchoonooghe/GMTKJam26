@@ -39,6 +39,11 @@ void APlayerControllerBase::SetupInputComponent()
 		{
 			EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &APlayerControllerBase::StartDash);
 		}
+
+		if (InteractAction)
+		{
+			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerControllerBase::StartInteract);
+		}
 	}
 }
 
@@ -90,5 +95,13 @@ void APlayerControllerBase::StartDash()
 	if (ControlledCharacter)
 	{
 		ControlledCharacter->RequestDash();
+	}
+}
+
+void APlayerControllerBase::StartInteract()
+{
+	if (ControlledCharacter)
+	{
+		ControlledCharacter->RequestInteract();
 	}
 }

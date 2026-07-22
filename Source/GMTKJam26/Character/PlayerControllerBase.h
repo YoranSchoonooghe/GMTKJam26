@@ -32,11 +32,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> DashAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> InteractAction;
+
 private:
 	void Move(const FInputActionValue& Value);
 	void StartJump();
 	void StopJump();
 	void StartDash();
+	void StartInteract();
 
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> ControlledCharacter;
