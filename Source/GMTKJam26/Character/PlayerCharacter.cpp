@@ -3,6 +3,7 @@
 #include "Components/DashComponent.h"
 #include "Components/PickupComponent.h"
 #include "Components/ThrowComponent.h"
+#include "Components/PlayerTimerComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -21,6 +22,7 @@ APlayerCharacter::APlayerCharacter()
 	DashComponent = CreateDefaultSubobject<UDashComponent>(TEXT("DashComponent"));
 	PickupComponent = CreateDefaultSubobject<UPickupComponent>(TEXT("PickupComponent"));
 	ThrowComponent = CreateDefaultSubobject<UThrowComponent>(TEXT("ThrowComponent"));
+	TimerComponent = CreateDefaultSubobject<UPlayerTimerComponent>(TEXT("TimerComponent"));
 }
 
 void APlayerCharacter::BeginPlay()

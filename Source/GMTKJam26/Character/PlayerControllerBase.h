@@ -8,6 +8,7 @@
 class UInputMappingContext;
 class UInputAction;
 class APlayerCharacter;
+class UPlayerTimerWidget;
 
 UCLASS()
 class GMTKJAM26_API APlayerControllerBase : public APlayerController
@@ -19,6 +20,9 @@ protected:
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UPlayerTimerWidget> TimerWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -44,4 +48,7 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> ControlledCharacter;
+
+	UPROPERTY()
+	TObjectPtr<UPlayerTimerWidget> TimerWidget;
 };

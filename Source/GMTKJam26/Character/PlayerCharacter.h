@@ -7,6 +7,7 @@
 class UDashComponent;
 class UPickupComponent;
 class UThrowComponent;
+class UPlayerTimerComponent;
 
 UCLASS()
 class GMTKJAM26_API APlayerCharacter : public ACharacter
@@ -21,6 +22,9 @@ public:
 
 	void RequestInteract();
 	void RequestDrop();
+
+	UFUNCTION(BlueprintPure, Category = "Timer")
+	UPlayerTimerComponent* GetTimerComponent() const { return TimerComponent; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -37,4 +41,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UThrowComponent> ThrowComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timer", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UPlayerTimerComponent> TimerComponent;
 };
