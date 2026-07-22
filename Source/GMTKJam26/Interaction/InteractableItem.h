@@ -11,7 +11,8 @@ enum class EInteractableItemState : uint8
 {
 	Grounded,
 	Held,
-	Flying
+	Flying,
+	Attached
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemLandedSignature, FVector, HitLocation);
@@ -32,6 +33,8 @@ public:
 	void Release();
 
 	void Throw(const FVector& Velocity);
+
+	void SnapToAttachPoint(const FVector& Location, const FRotator& Rotation);
 
 	UFUNCTION(BlueprintPure, Category = "Interaction")
 	EInteractableItemState GetItemState() const { return State; }

@@ -60,6 +60,20 @@ void AInteractableItem::Throw(const FVector& Velocity)
 	Mesh->AddImpulse(Velocity, NAME_None, true);
 }
 
+void AInteractableItem::SnapToAttachPoint(const FVector& Location, const FRotator& Rotation)
+{
+	State = EInteractableItemState::Attached;
+
+	Mesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
+	Mesh->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+	Mesh->SetSimulatePhysics(false);
+
+	SetActorLocation(Location);
+	SetActorRotation(Rotation);
+
+	bCanBePickedUp = false;
+}
+
 void AInteractableItem::OnMeshHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (State != EInteractableItemState::Flying)
