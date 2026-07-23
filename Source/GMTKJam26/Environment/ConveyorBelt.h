@@ -8,6 +8,8 @@ class UStaticMeshComponent;
 class UBoxComponent;
 class AInteractableItem;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemSpawnedSignature, AInteractableItem*, SpawnedItem);
+
 USTRUCT(BlueprintType)
 struct FConveyorSpawnEntry
 {
@@ -35,6 +37,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Conveyor|Spawning")
 	void DisableSpawning();
+
+	UPROPERTY(BlueprintAssignable, Category = "Conveyor|Events")
+	FOnItemSpawnedSignature OnItemSpawned;
 
 protected:
 	virtual void BeginPlay() override;

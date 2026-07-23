@@ -15,8 +15,12 @@ enum class EInteractableItemState : uint8
 	Attached
 };
 
+class ACharacter;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemLandedSignature, FVector, HitLocation);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAttachedSignature, FVector, AttachLocation);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnItemFlightStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemHitCharacterSignature, ACharacter*, HitCharacter);
 
 UCLASS()
 class GMTKJAM26_API AInteractableItem : public AActor
@@ -47,6 +51,14 @@ public:
 	FOnItemLandedSignature OnLanded;
 	UPROPERTY(BlueprintAssignable, Category = "Interaction")
 	FOnItemAttachedSignature OnAttached;
+
+	// Fires when this item is released via Throw() (covers the self-hit and any later throw) -
+	// distinct from UThrowComponent::OnItemThrown, which is on the thrower's own component.
+	UPROPERTY(BlueprintAssignable, Category = "Interaction")
+	FOnItemFlightStartedSignature OnThrown;
+
+	UPROPERTY(BlueprintAssignable, Category = "Interaction")
+	FOnItemHitCharacterSignature OnHitCharacter;
 
 protected:
 	virtual void BeginPlay() override;

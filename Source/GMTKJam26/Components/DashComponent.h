@@ -7,6 +7,10 @@
 
 class ACharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashEndedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDashHitCharacterSignature, ACharacter*, HitCharacter);
+
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class GMTKJAM26_API UDashComponent : public UActorComponent
 {
@@ -25,6 +29,15 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Dash")
 	bool CanDash() const { return bCanDash; }
+
+	UPROPERTY(BlueprintAssignable, Category = "Dash|Events")
+	FOnDashStartedSignature OnDashStarted;
+
+	UPROPERTY(BlueprintAssignable, Category = "Dash|Events")
+	FOnDashEndedSignature OnDashEnded;
+
+	UPROPERTY(BlueprintAssignable, Category = "Dash|Events")
+	FOnDashHitCharacterSignature OnDashHitCharacter;
 
 protected:
 	virtual void BeginPlay() override;
@@ -47,6 +60,7 @@ protected:
 private:
 	void StopDash();
 	void ResetDash();
+	void PushCharacter(ACharacter* OtherCharacter);
 
 	UFUNCTION()
 	void OnCharacterHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);

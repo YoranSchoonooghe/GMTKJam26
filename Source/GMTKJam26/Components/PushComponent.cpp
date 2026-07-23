@@ -145,6 +145,7 @@ void UPushComponent::ApplyKnockback(const FVector& SourceLocation, float Force, 
 	}
 
 	OwningCharacter->LaunchCharacter(Direction * Force + FVector::UpVector * UpwardForce, true, true);
+	OnKnockback.Broadcast(SourceLocation);
 }
 
 bool UPushComponent::TryShoveNearbyPlayer()
@@ -159,6 +160,7 @@ bool UPushComponent::TryShoveNearbyPlayer()
 		if (UPushComponent* OtherPush = OtherCharacter->FindComponentByClass<UPushComponent>())
 		{
 			OtherPush->ApplyKnockback(OwningCharacter->GetActorLocation(), ShoveForce, ShoveUpwardForce);
+			OnShove.Broadcast(OtherCharacter);
 			return true;
 		}
 	}

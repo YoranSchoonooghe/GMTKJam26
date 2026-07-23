@@ -7,6 +7,9 @@
 class UCapsuleComponent;
 class ACharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKnockbackSignature, FVector, SourceLocation);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnShoveSignature, ACharacter*, ShovedCharacter);
+
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class GMTKJAM26_API UPushComponent : public UActorComponent
 {
@@ -28,6 +31,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Push")
 	void SetZoneSize(float InRadiusPadding, float InHalfHeightPadding);
+
+	UPROPERTY(BlueprintAssignable, Category = "Push|Events")
+	FOnKnockbackSignature OnKnockback;
+
+	UPROPERTY(BlueprintAssignable, Category = "Push|Events")
+	FOnShoveSignature OnShove;
 
 protected:
 	virtual void BeginPlay() override;

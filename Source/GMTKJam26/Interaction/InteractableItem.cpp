@@ -61,6 +61,8 @@ void AInteractableItem::Throw(const FVector& Velocity)
 	Release();
 
 	Mesh->AddImpulse(Velocity, NAME_None, true);
+
+	OnThrown.Broadcast();
 }
 
 void AInteractableItem::SnapToAttachPoint(const FVector& Location, const FRotator& Rotation)
@@ -93,6 +95,7 @@ void AInteractableItem::OnMeshHit(UPrimitiveComponent* HitComponent, AActor* Oth
 			HitPush->ApplyKnockback(GetActorLocation(), ThrownHitPushForce, ThrownHitPushUpwardForce);
 		}
 
+		OnHitCharacter.Broadcast(HitCharacter);
 		return;
 	}
 

@@ -39,10 +39,9 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		{
 			for (ACharacter* NearbyCharacter : MyPush->GetOverlappingCharacters())
 			{
-				if (UPushComponent* OtherPush = NearbyCharacter->FindComponentByClass<UPushComponent>())
+				if (NearbyCharacter->FindComponentByClass<UPushComponent>())
 				{
-					bHasPushedThisDash = true;
-					OtherPush->ApplyKnockback(OwningCharacter->GetActorLocation(), PushForce, PushUpwardForce);
+					PushCharacter(NearbyCharacter);
 					break;
 				}
 			}
@@ -74,6 +73,8 @@ void UDashComponent::StartDash()
 
 	OwningCharacter->GetWorldTimerManager().SetTimer(DashDurationTimerHandle, this, &UDashComponent::StopDash, DashDuration, false);
 	OwningCharacter->GetWorldTimerManager().SetTimer(DashCooldownTimerHandle, this, &UDashComponent::ResetDash, DashCooldown, false);
+
+	OnDashStarted.Broadcast();
 }
 
 void UDashComponent::StopDash()
@@ -84,6 +85,8 @@ void UDashComponent::StopDash()
 	{
 		OwningCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 	}
+
+	OnDashEnded.Broadcast();
 }
 
 void UDashComponent::ResetDash()
@@ -99,14 +102,28 @@ void UDashComponent::OnCharacterHit(AActor* SelfActor, AActor* OtherActor, FVect
 	}
 
 	ACharacter* OtherCharacter = Cast<ACharacter>(OtherActor);
-	if (!OtherCharacter)
+	if (!OtherCharacter || !OtherCharacter->FindComponentByClass<UPushComponent>())
 	{
 		return;
 	}
 
-	if (UPushComponent* OtherPush = OtherCharacter->FindComponentByClass<UPushComponent>())
+	PushCharacter(OtherCharacter);
+}
+
+void UDashComponent::PushCharacter(ACharacter* OtherCharacter)
+{
+	if (!OtherCharacter || !OwningCharacter.IsValid())
 	{
-		bHasPushedThisDash = true;
-		OtherPush->ApplyKnockback(OwningCharacter->GetActorLocation(), PushForce, PushUpwardForce);
+		return;
 	}
+
+	UPushComponent* OtherPush = OtherCharacter->FindComponentByClass<UPushComponent>();
+	if (!OtherPush)
+	{
+		return;
+	}
+
+	bHasPushedThisDash = true;
+	OtherPush->ApplyKnockback(OwningCharacter->GetActorLocation(), PushForce, PushUpwardForce);
+	OnDashHitCharacter.Broadcast(OtherCharacter);
 }

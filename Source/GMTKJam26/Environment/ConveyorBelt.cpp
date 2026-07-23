@@ -105,7 +105,10 @@ void AConveyorBelt::SpawnItem()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		GetWorld()->SpawnActor<AInteractableItem>(ChosenClass, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation(), SpawnParams);
+		if (AInteractableItem* SpawnedItem = GetWorld()->SpawnActor<AInteractableItem>(ChosenClass, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation(), SpawnParams))
+		{
+			OnItemSpawned.Broadcast(SpawnedItem);
+		}
 	}
 
 	if (bSpawningEnabled && ItemsToSpawn.Num() > 0)
