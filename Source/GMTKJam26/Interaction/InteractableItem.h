@@ -85,15 +85,31 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Interaction|Push")
 	float ThrownHitPushUpwardForce = 150.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
+	float AttachDuration{ 0.3f };
+
+public:
+	virtual void Tick(float DeltaTime) override;
+
 private:
 	UFUNCTION()
 	void OnMeshHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	void ResetPickupCooldown();
 
+	void UpdateAttachedState(float DeltaTime);
+
 	EInteractableItemState State = EInteractableItemState::Grounded;
 	bool bCanBePickedUp = true;
 	FTimerHandle PickupCooldownTimerHandle;
 
 	TWeakObjectPtr<AActor> LastHolder;
+
+	bool _bIsAttaching{ false };
+	float _elapsedAttachTime{ 0.0f };
+
+	FVector _startLocation{};
+	FVector _targetLocation{};
+	FRotator _startRotation{};
+	FRotator _targetRotation{};
 };

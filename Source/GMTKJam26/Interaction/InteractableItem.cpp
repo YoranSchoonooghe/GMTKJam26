@@ -6,7 +6,7 @@
 
 AInteractableItem::AInteractableItem()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
@@ -77,12 +77,18 @@ void AInteractableItem::SnapToAttachPoint(const FVector& Location, const FRotato
 	Mesh->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
 	Mesh->SetSimulatePhysics(false);
 
-	SetActorLocation(Location);
-	SetActorRotation(Rotation);
-
 	bCanBePickedUp = false;
 
-	OnAttached.Broadcast(Location);
+	_startLocation = GetActorLocation();
+	_startRotation = GetActorRotation();
+
+	_targetLocation = Location;
+	_targetRotation = Rotation;
+
+	_elapsedAttachTime = 0.0f;
+	_bIsAttaching = true;
+
+	//OnAttached.Broadcast(Location);
 }
 
 void AInteractableItem::SetHighlight(bool highlighted)
@@ -95,6 +101,13 @@ void AInteractableItem::SetHighlight(bool highlighted)
 	{
 		Mesh->SetOverlayMaterial(nullptr);
 	}
+}
+
+void AInteractableItem::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	UpdateAttachedState(DeltaTime);
 }
 
 void AInteractableItem::OnMeshHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -138,4 +151,28 @@ void AInteractableItem::OnMeshHit(UPrimitiveComponent* HitComponent, AActor* Oth
 void AInteractableItem::ResetPickupCooldown()
 {
 	bCanBePickedUp = true;
+}
+
+void AInteractableItem::UpdateAttachedState(float DeltaTime)
+{
+	if (!_bIsAttaching) return;
+
+	_elapsedAttachTime += DeltaTime;
+
+	float alpha = FMath::Clamp(_elapsedAttachTime / AttachDuration, 0.0f, 1.0f);
+
+	alpha = FMath::InterpEaseInOut(0.0f, 1.0f, alpha, 2.0f);
+
+	SetActorLocation(FMath::Lerp(_startLocation, _targetLocation, alpha));
+	SetActorRotation(FMath::Lerp(_startRotation, _targetRotation, alpha));
+
+	if (alpha >= 1.0f)
+	{
+		_bIsAttaching = false;
+
+		SetActorLocation(_targetLocation);
+		SetActorRotation(_targetRotation);
+
+		OnAttached.Broadcast(_targetLocation);
+	}
 }
