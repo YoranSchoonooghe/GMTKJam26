@@ -2,11 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RobotPart.h"
 #include "ItemPlacementActor.generated.h"
 
 class UBoxComponent;
 class UWidgetComponent;
-class AInteractableItem;
+class APlayerCharacter;
 
 UCLASS()
 class GMTKJAM26_API AItemPlacementActor : public AActor
@@ -25,6 +26,12 @@ protected:
 	TObjectPtr<UStaticMeshComponent> PreviewMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UWidgetComponent> InteractWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Robot Part")
+	EPartType ExpectedPartType{ EPartType::Head };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target Player")
+	int32 PlayerIndex{ 0 };
 
 	UFUNCTION()
 	void OnBeginOverlap(
@@ -47,13 +54,12 @@ public:
 
 private:
 	UFUNCTION()
-	void ShowAttachHint();
-	UFUNCTION()
-	void HideAttachHint();
+	void RetrievePlayerItem();
 	UFUNCTION()
 	void TryAttach();
 
 	bool _bHasItem{ false };
 	bool _bPlayerIsInRange{ false };
-	AInteractableItem* _targetItem{ nullptr };
+	ARobotPart* _targetItem{ nullptr };
+	APlayerCharacter* _targetPlayer{ nullptr };
 };

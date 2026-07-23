@@ -39,15 +39,15 @@ void AItemPlacementActor::BeginPlay()
 	
 	PreviewMesh->SetHiddenInGame(true);
 
-	auto Player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (Player)
+	_targetPlayer = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, PlayerIndex));
+	if (_targetPlayer)
 	{
-		if (auto* pPickupComponent = Player->GetPickupComponent())
+		if (auto* pPickupComponent = _targetPlayer->GetPickupComponent())
 		{
-			pPickupComponent->OnItemPickedUp.AddDynamic(this, &AItemPlacementActor::ShowAttachHint);
+			pPickupComponent->OnItemPickedUp.AddDynamic(this, &AItemPlacementActor::RetrievePlayerItem);
 			pPickupComponent->OnItemDropped.AddDynamic(this, &AItemPlacementActor::TryAttach);
 		}
-		if (auto* pThrowComponent = Player->GetThrowComponent())
+		if (auto* pThrowComponent = _targetPlayer->GetThrowComponent())
 		{
 			pThrowComponent->OnItemThrown.AddDynamic(this, &AItemPlacementActor::TryAttach);
 		}
@@ -61,35 +61,17 @@ void AItemPlacementActor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponen
 
 	if (auto* pPlayer = Cast<APlayerCharacter>(OtherActor))
 	{
+		if (_targetPlayer != pPlayer) return;
+
 		_bPlayerIsInRange = true;
 
-		if (auto* pItem = pPlayer->GetPickupComponent()->GetHeldItem())
+		if (!_targetItem) return;
+
+		if (_targetItem->GetPartType() == ExpectedPartType)
 		{
-			_targetItem = pItem;
 			InteractWidget->SetHiddenInGame(false);
 		}
 	}
-
-	//auto* pItem = Cast<AInteractableItem>(OtherActor);
-	//if (!pItem) return;
-
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Item entered trigger");
-
-	//FTimerHandle TimerHandle;
-
-	//GetWorld()->GetTimerManager().SetTimer(TimerHandle,
-	//	[this, pItem]()
-	//	{
-	//		if (!IsValid(this) || !IsValid(pItem))
-	//			return;
-
-	//		pItem->SnapToAttachPoint(PreviewMesh->GetComponentLocation(), PreviewMesh->GetComponentRotation());
-	//		_bHasItem = true;
-	//		PreviewMesh->SetHiddenInGame(true);
-	//	},
-	//	0.05f,
-	//	false
-	//);
 }
 
 void AItemPlacementActor::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -99,8 +81,7 @@ void AItemPlacementActor::OnEndOverlap(UPrimitiveComponent* OverlappedComponent,
 	{
 		_bPlayerIsInRange = false;
 		InteractWidget->SetHiddenInGame(true);
-
-		}
+	}
 }
 
 void AItemPlacementActor::Tick(float DeltaTime)
@@ -109,16 +90,17 @@ void AItemPlacementActor::Tick(float DeltaTime)
 
 }
 
-void AItemPlacementActor::ShowAttachHint()
+void AItemPlacementActor::RetrievePlayerItem()
 {
 	if (_bHasItem) return;
 
-	PreviewMesh->SetHiddenInGame(false);
-}
+	_targetItem = Cast<ARobotPart>(_targetPlayer->GetPickupComponent()->GetHeldItem());
+	if (!_targetItem) return;
 
-void AItemPlacementActor::HideAttachHint()
-{
-	PreviewMesh->SetHiddenInGame(true);
+	if (_targetItem->GetPartType() == ExpectedPartType)
+	{
+		PreviewMesh->SetHiddenInGame(false);
+	}
 }
 
 void AItemPlacementActor::TryAttach()
@@ -128,6 +110,7 @@ void AItemPlacementActor::TryAttach()
 
 	if (!_bPlayerIsInRange) return;
 	if (!_targetItem) return;
+	if (_targetItem->GetPartType() != ExpectedPartType) return;
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Item entered trigger");
 
