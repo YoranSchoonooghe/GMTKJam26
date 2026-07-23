@@ -15,8 +15,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/ForceFeedbackEffect.h"
 #include "GameFramework/ForceFeedbackParameters.h"
-#include "Camera/CameraShakeBase.h"
-#include "Camera/PlayerCameraManager.h"
 
 void APlayerControllerBase::BeginPlay()
 {
@@ -137,21 +135,11 @@ void APlayerControllerBase::HandleThrowRumble()
 void APlayerControllerBase::HandleOwnDeathRumble(FVector DeathLocation)
 {
 	PlayRumbleEffect(DeathRumbleEffect);
-	ShakeCamera(DeathCameraShake);
 }
 
 void APlayerControllerBase::NotifyItemPlaced()
 {
 	PlayRumbleEffect(PlacementRumbleEffect);
-	ShakeCamera(PlacementCameraShake);
-}
-
-void APlayerControllerBase::ShakeCamera(TSubclassOf<UCameraShakeBase> ShakeClass, float Scale)
-{
-	if (ShakeClass && PlayerCameraManager)
-	{
-		PlayerCameraManager->StartCameraShake(ShakeClass, Scale);
-	}
 }
 
 void APlayerControllerBase::NotifyOpponentDied(FVector DeathLocation)

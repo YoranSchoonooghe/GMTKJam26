@@ -11,6 +11,7 @@ class UPlayerTimerComponent;
 class UPushComponent;
 class URespawnComponent;
 class UDropComponent;
+class UCameraShakeComponent;
 
 UCLASS()
 class GMTKJAM26_API APlayerCharacter : public ACharacter
@@ -69,6 +70,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Drop", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDropComponent> DropComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera Shake", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCameraShakeComponent> CameraShakeComponent;
+
 	UFUNCTION()
 	void UpdateWalkSpeed();
+
+	UFUNCTION()
+	void HandlePlayerDied(FVector DeathLocation);
 };

@@ -11,7 +11,6 @@ class APlayerCharacter;
 class UPlayerTimerWidget;
 class UMenuStateBase;
 class UForceFeedbackEffect;
-class UCameraShakeBase;
 
 UCLASS()
 class GMTKJAM26_API APlayerControllerBase : public APlayerController
@@ -36,9 +35,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Rumble")
 	void NotifyItemPlaced();
-
-	UFUNCTION(BlueprintCallable, Category = "Camera")
-	void ShakeCamera(TSubclassOf<UCameraShakeBase> ShakeClass, float Scale = 1.f);
 
 protected:
 	virtual void BeginPlay() override;
@@ -99,12 +95,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Rumble")
 	TObjectPtr<UForceFeedbackEffect> PlacementRumbleEffect;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Camera")
-	TSubclassOf<UCameraShakeBase> PlacementCameraShake;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Camera")
-	TSubclassOf<UCameraShakeBase> DeathCameraShake;
 
 private:
 	void Move(const FInputActionValue& Value);
