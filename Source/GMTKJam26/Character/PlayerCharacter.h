@@ -9,6 +9,7 @@ class UPickupComponent;
 class UThrowComponent;
 class UPlayerTimerComponent;
 class UPushComponent;
+class URespawnComponent;
 
 UCLASS()
 class GMTKJAM26_API APlayerCharacter : public ACharacter
@@ -51,4 +52,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Push", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UPushComponent> PushComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Respawn", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<URespawnComponent> RespawnComponent;
 };
