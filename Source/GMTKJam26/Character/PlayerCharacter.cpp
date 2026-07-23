@@ -7,7 +7,6 @@
 #include "Components/PushComponent.h"
 #include "Components/RespawnComponent.h"
 #include "Components/DropComponent.h"
-#include "Components/CameraShakeComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -30,7 +29,6 @@ APlayerCharacter::APlayerCharacter()
 	PushComponent = CreateDefaultSubobject<UPushComponent>(TEXT("PushComponent"));
 	RespawnComponent = CreateDefaultSubobject<URespawnComponent>(TEXT("RespawnComponent"));
 	DropComponent = CreateDefaultSubobject<UDropComponent>(TEXT("DropComponent"));
-	CameraShakeComponent = CreateDefaultSubobject<UCameraShakeComponent>(TEXT("CameraShakeComponent"));
 }
 
 void APlayerCharacter::BeginPlay()
@@ -41,8 +39,6 @@ void APlayerCharacter::BeginPlay()
 	PickupComponent->OnItemDropped.AddDynamic(this, &APlayerCharacter::UpdateWalkSpeed);
 	ThrowComponent->OnItemThrown.AddDynamic(this, &APlayerCharacter::UpdateWalkSpeed);
 	DropComponent->OnItemLost.AddDynamic(this, &APlayerCharacter::UpdateWalkSpeed);
-
-	RespawnComponent->OnPlayerDied.AddDynamic(this, &APlayerCharacter::HandlePlayerDied);
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -60,11 +56,6 @@ void APlayerCharacter::UpdateWalkSpeed()
 	{
 		GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
 	}
-}
-
-void APlayerCharacter::HandlePlayerDied(FVector DeathLocation)
-{
-	CameraShakeComponent->ShakeCamera();
 }
 
 void APlayerCharacter::Move(const FVector2D& MovementVector)

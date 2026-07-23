@@ -15,6 +15,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/ForceFeedbackEffect.h"
 #include "GameFramework/ForceFeedbackParameters.h"
+#include "Camera/CameraShakeBase.h"
+#include "Camera/PlayerCameraManager.h"
 
 void APlayerControllerBase::BeginPlay()
 {
@@ -135,11 +137,31 @@ void APlayerControllerBase::HandleThrowRumble()
 void APlayerControllerBase::HandleOwnDeathRumble(FVector DeathLocation)
 {
 	PlayRumbleEffect(DeathRumbleEffect);
+	ShakeCamera(DeathCameraShake);
+}
+
+void APlayerControllerBase::NotifyItemPlaced()
+{
+	PlayRumbleEffect(PlacementRumbleEffect);
+	ShakeCamera(PlacementCameraShake);
+}
+
+void APlayerControllerBase::ShakeCamera(TSubclassOf<UCameraShakeBase> ShakeClass, float Scale)
+{
+	if (ShakeClass && PlayerCameraManager)
+	{
+		PlayerCameraManager->StartCameraShake(ShakeClass, Scale);
+	}
 }
 
 void APlayerControllerBase::NotifyOpponentDied(FVector DeathLocation)
 {
 	PlayRumbleEffect(KillRumbleEffect);
+}
+
+void APlayerControllerBase::HandleShoveRumble(ACharacter* ShovedCharacter)
+{
+	PlayRumbleEffect(ShoveRumbleEffect);
 }
 
 void APlayerControllerBase::OnPossess(APawn* InPawn)
@@ -153,6 +175,7 @@ void APlayerControllerBase::OnPossess(APawn* InPawn)
 		if (UPushComponent* Push = ControlledCharacter->GetPushComponent())
 		{
 			Push->OnKnockback.AddUniqueDynamic(this, &APlayerControllerBase::HandleKnockbackRumble);
+			Push->OnShove.AddUniqueDynamic(this, &APlayerControllerBase::HandleShoveRumble);
 		}
 
 		if (UDashComponent* Dash = ControlledCharacter->GetDashComponent())

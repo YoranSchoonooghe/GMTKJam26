@@ -9,6 +9,7 @@
 #include "Components/WidgetComponent.h"
 #include "RobotPart.h"
 #include "Character/PlayerCharacter.h"
+#include "Character/PlayerControllerBase.h"
 #include "Components/PlayerTimerComponent.h"
 
 AItemPlacementActor::AItemPlacementActor()
@@ -133,6 +134,11 @@ void AItemPlacementActor::TryAttach()
 			if (UPlayerTimerComponent* TimerComponent = HolderCharacter->GetTimerComponent())
 			{
 				TimerComponent->AddItem(RobotPart);
+			}
+
+			if (APlayerControllerBase* PC = Cast<APlayerControllerBase>(HolderCharacter->GetController()))
+			{
+				PC->NotifyItemPlaced();
 			}
 		}
 	}
