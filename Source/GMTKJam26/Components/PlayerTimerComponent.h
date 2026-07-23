@@ -41,6 +41,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Timer")
 	bool AddItem(ARobotPart* Item);
 
+	UFUNCTION(BlueprintCallable, Category = "Timer")
+	void ForfeitActiveSegment();
+
 	UFUNCTION(BlueprintPure, Category = "Timer")
 	TArray<FTimerSegment> GetSegments() const { return Segments; }
 

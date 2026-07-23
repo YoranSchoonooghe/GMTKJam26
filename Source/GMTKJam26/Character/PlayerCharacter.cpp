@@ -65,6 +65,11 @@ void APlayerCharacter::UpdateWalkSpeed()
 void APlayerCharacter::HandlePlayerDied(FVector DeathLocation)
 {
 	CameraShakeComponent->ShakeCamera();
+
+	if (TimerComponent)
+	{
+		TimerComponent->ForfeitActiveSegment();
+	}
 }
 
 void APlayerCharacter::Move(const FVector2D& MovementVector)

@@ -86,6 +86,24 @@ bool UPlayerTimerComponent::AddItem(ARobotPart* Item)
 	return false;
 }
 
+void UPlayerTimerComponent::ForfeitActiveSegment()
+{
+	const int32 ActiveIndex = FindActiveSegmentIndex();
+	if (ActiveIndex == INDEX_NONE)
+	{
+		return;
+	}
+
+	FTimerSegment& ActiveSegment = Segments[ActiveIndex];
+	if (!ActiveSegment.ItemClass)
+	{
+		return;
+	}
+
+	ActiveSegment.RemainingTime = 0.f;
+	OnSegmentDepleted.Broadcast(ActiveIndex);
+}
+
 float UPlayerTimerComponent::GetTotalRemainingTime() const
 {
 	float Total = 0.f;
