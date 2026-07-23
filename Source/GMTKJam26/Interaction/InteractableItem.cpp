@@ -85,6 +85,18 @@ void AInteractableItem::SnapToAttachPoint(const FVector& Location, const FRotato
 	OnAttached.Broadcast(Location);
 }
 
+void AInteractableItem::SetHighlight(bool highlighted)
+{
+	if (highlighted)
+	{
+		Mesh->SetOverlayMaterial(OutlineMaterial);
+	}
+	else
+	{
+		Mesh->SetOverlayMaterial(nullptr);
+	}
+}
+
 void AInteractableItem::OnMeshHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (ACharacter* HitCharacter = Cast<ACharacter>(OtherActor))

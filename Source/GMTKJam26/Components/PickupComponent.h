@@ -49,6 +49,31 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
 	FVector InteractionZoneOffset = FVector(100.f, 0.f, 0.f);
 
+	UFUNCTION()
+	void OnBeginOverlap(
+		UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 BodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnEndOverlap(
+		UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 BodyIndex);
+
+	UPROPERTY()
+	TArray<AInteractableItem*> NearbyItems;
+
+	UPROPERTY()
+	TObjectPtr<AInteractableItem> HighlightedItem;
+
+public:
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 private:
 	void EquipItem(AInteractableItem* ItemToEquip);
 

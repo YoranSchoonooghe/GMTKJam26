@@ -5,7 +5,7 @@
 
 UPickupComponent::UPickupComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UPickupComponent::BeginPlay()
@@ -22,6 +22,9 @@ void UPickupComponent::BeginPlay()
 		InteractionZone->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
 		InteractionZone->RegisterComponent();
 		InteractionZone->AttachToComponent(Owner->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+
+		InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &UPickupComponent::OnBeginOverlap);
+		InteractionZone->OnComponentEndOverlap.AddDynamic(this, &UPickupComponent::OnEndOverlap);
 	}
 }
 
@@ -58,6 +61,70 @@ void UPickupComponent::TryPickup()
 	if (ClosestItem)
 	{
 		EquipItem(ClosestItem);
+
+		if (HighlightedItem)
+		{
+			HighlightedItem->SetHighlight(false);
+		}
+	}
+}
+
+void UPickupComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AInteractableItem* Item = Cast<AInteractableItem>(OtherActor);
+	if (!Item || !Item->CanBePickedUp()) return;
+	
+	NearbyItems.AddUnique(Item);
+}
+
+void UPickupComponent::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (AInteractableItem* Item = Cast<AInteractableItem>(OtherActor))
+	{
+		NearbyItems.Remove(Item);
+	}
+}
+
+void UPickupComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (HeldItem) return;
+
+	AInteractableItem* closestItem = nullptr;
+	float smallestDistance = MAX_FLT;
+
+	for (AInteractableItem* Item : NearbyItems)
+	{
+		if (!IsValid(Item) || !Item->CanBePickedUp())
+		{
+			continue;
+		}
+
+		float DistSq = FVector::DistSquared(GetOwner()->GetActorLocation(), Item->GetActorLocation());
+
+		if (DistSq < smallestDistance)
+		{
+			smallestDistance = DistSq;
+			closestItem = Item;
+		}
+	}
+
+	if (HighlightedItem != closestItem)
+	{
+		if (HighlightedItem)
+		{
+			HighlightedItem->SetHighlight(false);
+		}
+
+		HighlightedItem = closestItem;
+
+		if (HighlightedItem)
+		{
+			HighlightedItem->SetHighlight(true);
+		}
 	}
 }
 
