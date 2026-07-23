@@ -89,6 +89,10 @@ void AConveyorBelt::Tick(float DeltaTime)
 
 			const FVector NewXY = FMath::VInterpConstantTo(CurrentXY, TargetXY, DeltaTime, ConveyorAcceleration);
 			RootPrimitive->SetPhysicsLinearVelocity(FVector(NewXY.X, NewXY.Y, CurrentVelocity.Z));
+
+			const FVector CurrentAngularVelocity = RootPrimitive->GetPhysicsAngularVelocityInDegrees();
+			const FVector NewAngularVelocity = FMath::VInterpConstantTo(CurrentAngularVelocity, FVector::ZeroVector, DeltaTime, AngularDampingRate);
+			RootPrimitive->SetPhysicsAngularVelocityInDegrees(NewAngularVelocity);
 		}
 		else
 		{
