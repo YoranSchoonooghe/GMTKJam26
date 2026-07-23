@@ -71,4 +71,7 @@ protected:
 
 	UFUNCTION()
 	void UpdateWalkSpeed();
+
+	UFUNCTION()
+	void HandlePlayerDied(FVector DeathLocation);
 };

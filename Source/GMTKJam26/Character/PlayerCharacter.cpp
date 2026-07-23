@@ -39,6 +39,8 @@ void APlayerCharacter::BeginPlay()
 	PickupComponent->OnItemDropped.AddDynamic(this, &APlayerCharacter::UpdateWalkSpeed);
 	ThrowComponent->OnItemThrown.AddDynamic(this, &APlayerCharacter::UpdateWalkSpeed);
 	DropComponent->OnItemLost.AddDynamic(this, &APlayerCharacter::UpdateWalkSpeed);
+
+	RespawnComponent->OnPlayerDied.AddDynamic(this, &APlayerCharacter::HandlePlayerDied);
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -60,8 +62,6 @@ void APlayerCharacter::UpdateWalkSpeed()
 
 void APlayerCharacter::HandlePlayerDied(FVector DeathLocation)
 {
-	CameraShakeComponent->ShakeCamera();
-
 	if (TimerComponent)
 	{
 		TimerComponent->ForfeitActiveSegment();

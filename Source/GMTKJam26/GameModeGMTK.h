@@ -7,10 +7,16 @@
 
 class UMenuStateBase;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameOverSequenceStartedSignature, APawn*, LosingPawn);
+
 UCLASS()
 class GMTKJAM26_API AGameModeGMTK : public AGameModeBase
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "GameOver")
+	FOnGameOverSequenceStartedSignature OnGameOverSequenceStarted;
 
 protected:
 	virtual void BeginPlay() override;
@@ -23,6 +29,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "GameOver")
 	TSubclassOf<UMenuStateBase> GameOverStateClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "GameOver", meta = (ClampMin = "0.0"))
+	float GameOverDelaySeconds = 2.f;
+
 private:
 	void BindPlayerTimerEvents();
 	void BindPlayerRespawnEvents();
@@ -34,10 +43,13 @@ private:
 	void HandlePlayer2TimerExpired();
 
 	void HandleGameOver(int32 LosingPlayerIndex);
+	void ShowGameOverMenu();
 
 	int32 NextPlayerStartIndex = 0;
+	int32 PendingWinningPlayerIndex = -1;
 	bool bGameOverTriggered = false;
 
 	FTimerHandle BindTimerEventsRetryHandle;
 	FTimerHandle BindRespawnEventsRetryHandle;
+	FTimerHandle GameOverDelayTimerHandle;
 };

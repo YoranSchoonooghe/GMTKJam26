@@ -128,12 +128,26 @@ void AGameModeGMTK::HandleGameOver(int32 LosingPlayerIndex)
 	}
 
 	bGameOverTriggered = true;
+	PendingWinningPlayerIndex = (LosingPlayerIndex == 0) ? 1 : 0;
 
-	const int32 WinningPlayerIndex = (LosingPlayerIndex == 0) ? 1 : 0;
+	if (APawn* LosingPawn = UGameplayStatics::GetPlayerPawn(this, LosingPlayerIndex))
+	{
+		if (AController* LosingController = LosingPawn->GetController())
+		{
+			LosingController->UnPossess();
+		}
 
+		OnGameOverSequenceStarted.Broadcast(LosingPawn);
+	}
+
+	GetWorldTimerManager().SetTimer(GameOverDelayTimerHandle, this, &AGameModeGMTK::ShowGameOverMenu, GameOverDelaySeconds, false);
+}
+
+void AGameModeGMTK::ShowGameOverMenu()
+{
 	if (UMenuFlowSubsystem* Flow = GetGameInstance() ? GetGameInstance()->GetSubsystem<UMenuFlowSubsystem>() : nullptr)
 	{
-		Flow->SetGameOverWinnerIndex(WinningPlayerIndex);
+		Flow->SetGameOverWinnerIndex(PendingWinningPlayerIndex);
 		Flow->PushState(GameOverStateClass);
 	}
 }
