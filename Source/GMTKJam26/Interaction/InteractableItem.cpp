@@ -3,6 +3,7 @@
 #include "GameFramework/Character.h"
 #include "Components/PushComponent.h"
 #include "GMTKJam26/Character/PlayerControllerBase.h"
+#include "GMTKJam26/Events/EventBusSubsystem.h"
 
 AInteractableItem::AInteractableItem()
 {
@@ -174,5 +175,6 @@ void AInteractableItem::UpdateAttachedState(float DeltaTime)
 		SetActorRotation(_targetRotation);
 
 		OnAttached.Broadcast(_targetLocation);
+		GetWorld()->GetSubsystem<UEventBusSubsystem>()->SendEvent("OnRobotPartAttached");
 	}
 }
