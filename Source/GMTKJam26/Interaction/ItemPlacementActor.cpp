@@ -17,7 +17,7 @@ AItemPlacementActor::AItemPlacementActor()
 	auto* pRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = pRoot;
 
-	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerZone"));
+	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnVolume"));
 	TriggerBox->SetupAttachment(pRoot);
 
 	PreviewMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PreviewMesh"));
