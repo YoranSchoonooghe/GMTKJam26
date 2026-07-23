@@ -4,6 +4,7 @@
 #include "GMTKJam26/Character/PlayerCharacter.h"
 #include "GMTKJam26/Components/PickupComponent.h"
 #include "GMTKJam26/Components/ThrowComponent.h"
+#include "GMTKJam26/Components/DropComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/WidgetComponent.h"
 #include "RobotPart.h"
@@ -50,6 +51,10 @@ void AItemPlacementActor::BeginPlay()
 		if (auto* pThrowComponent = _targetPlayer->GetThrowComponent())
 		{
 			pThrowComponent->OnItemThrown.AddDynamic(this, &AItemPlacementActor::TryAttach);
+		}
+		if (auto* pDropComponent = _targetPlayer->GetDropComponent())
+		{
+			pDropComponent->OnItemLost.AddDynamic(this, &AItemPlacementActor::ClearTargetItem);
 		}
 	}
 }
@@ -131,5 +136,13 @@ void AItemPlacementActor::TryAttach()
 			}
 		}
 	}
+}
+
+void AItemPlacementActor::ClearTargetItem()
+{
+	PreviewMesh->SetHiddenInGame(true);
+	InteractWidget->SetHiddenInGame(true);
+
+	_targetItem = nullptr;
 }
 

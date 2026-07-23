@@ -6,6 +6,7 @@
 #include "Components/PlayerTimerComponent.h"
 #include "Components/PushComponent.h"
 #include "Components/RespawnComponent.h"
+#include "Components/DropComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -27,6 +28,7 @@ APlayerCharacter::APlayerCharacter()
 	TimerComponent = CreateDefaultSubobject<UPlayerTimerComponent>(TEXT("TimerComponent"));
 	PushComponent = CreateDefaultSubobject<UPushComponent>(TEXT("PushComponent"));
 	RespawnComponent = CreateDefaultSubobject<URespawnComponent>(TEXT("RespawnComponent"));
+	DropComponent = CreateDefaultSubobject<UDropComponent>(TEXT("DropComponent"));
 }
 
 void APlayerCharacter::BeginPlay()

@@ -10,6 +10,7 @@ class UThrowComponent;
 class UPlayerTimerComponent;
 class UPushComponent;
 class URespawnComponent;
+class UDropComponent;
 
 UCLASS()
 class GMTKJAM26_API APlayerCharacter : public ACharacter
@@ -30,6 +31,7 @@ public:
 
 	UPickupComponent* GetPickupComponent() { return PickupComponent; }
 	UThrowComponent* GetThrowComponent() { return ThrowComponent; }
+	UDropComponent* GetDropComponent() { return DropComponent; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -55,4 +57,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Respawn", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URespawnComponent> RespawnComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Drop", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UDropComponent> DropComponent;
 };

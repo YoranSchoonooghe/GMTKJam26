@@ -57,6 +57,8 @@ private:
 	void RetrievePlayerItem();
 	UFUNCTION()
 	void TryAttach();
+	UFUNCTION()
+	void ClearTargetItem();
 
 	bool _bHasItem{ false };
 	bool _bPlayerIsInRange{ false };
