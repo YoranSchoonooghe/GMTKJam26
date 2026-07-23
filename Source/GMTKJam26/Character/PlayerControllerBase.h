@@ -9,6 +9,7 @@ class UInputMappingContext;
 class UInputAction;
 class APlayerCharacter;
 class UPlayerTimerWidget;
+class UMenuStateBase;
 
 UCLASS()
 class GMTKJAM26_API APlayerControllerBase : public APlayerController
@@ -23,6 +24,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UPlayerTimerWidget> TimerWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Menu")
+	TSubclassOf<UMenuStateBase> DefaultRootMenuState;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> PauseAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -45,6 +52,7 @@ private:
 	void StopJump();
 	void StartDash();
 	void StartInteract();
+	void RequestPauseToggle();
 
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> ControlledCharacter;

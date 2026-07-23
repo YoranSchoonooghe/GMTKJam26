@@ -3,6 +3,8 @@
 #include "Camera/TopDownCameraActor.h"
 #include "UI/PlayerTimerWidget.h"
 #include "Components/PlayerTimerComponent.h"
+#include "Menu/MenuFlowSubsystem.h"
+#include "Menu/States/MenuStateBase.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/GameplayStatics.h"
@@ -16,6 +18,22 @@ void APlayerControllerBase::BeginPlay()
 		if (DefaultMappingContext)
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+
+	if (AActor* StaticCamera = UGameplayStatics::GetActorOfClass(GetWorld(), ATopDownCameraActor::StaticClass()))
+	{
+		SetViewTarget(StaticCamera);
+	}
+
+	if (DefaultRootMenuState)
+	{
+		if (UMenuFlowSubsystem* Flow = GetGameInstance() ? GetGameInstance()->GetSubsystem<UMenuFlowSubsystem>() : nullptr)
+		{
+			if (!Flow->GetCurrentState())
+			{
+				Flow->SetRootState(DefaultRootMenuState);
+			}
 		}
 	}
 }
@@ -46,6 +64,11 @@ void APlayerControllerBase::SetupInputComponent()
 		{
 			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerControllerBase::StartInteract);
 		}
+
+		if (PauseAction)
+		{
+			EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &APlayerControllerBase::RequestPauseToggle);
+		}
 	}
 }
 
@@ -54,11 +77,6 @@ void APlayerControllerBase::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	ControlledCharacter = Cast<APlayerCharacter>(InPawn);
-
-	if (AActor* StaticCamera = UGameplayStatics::GetActorOfClass(GetWorld(), ATopDownCameraActor::StaticClass()))
-	{
-		SetViewTarget(StaticCamera);
-	}
 
 	if (ControlledCharacter && TimerWidgetClass && IsLocalPlayerController())
 	{
@@ -141,5 +159,13 @@ void APlayerControllerBase::StartInteract()
 	if (ControlledCharacter)
 	{
 		ControlledCharacter->RequestInteract();
+	}
+}
+
+void APlayerControllerBase::RequestPauseToggle()
+{
+	if (UMenuFlowSubsystem* Flow = GetGameInstance() ? GetGameInstance()->GetSubsystem<UMenuFlowSubsystem>() : nullptr)
+	{
+		Flow->RequestBack();
 	}
 }
