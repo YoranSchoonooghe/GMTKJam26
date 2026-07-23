@@ -5,8 +5,10 @@
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/PlayerTimerComponent.h"
+#include "Components/RespawnComponent.h"
 #include "Menu/MenuFlowSubsystem.h"
 #include "Menu/States/MenuStateBase.h"
+#include "Character/PlayerControllerBase.h"
 
 void AGameModeGMTK::BeginPlay()
 {
@@ -31,6 +33,7 @@ void AGameModeGMTK::BeginPlay()
 	}
 
 	BindPlayerTimerEvents();
+	BindPlayerRespawnEvents();
 }
 
 void AGameModeGMTK::BindPlayerTimerEvents()
@@ -67,6 +70,43 @@ void AGameModeGMTK::BindPlayerTimerEvents()
 	if (!bBothBound)
 	{
 		GetWorldTimerManager().SetTimer(BindTimerEventsRetryHandle, this, &AGameModeGMTK::BindPlayerTimerEvents, 0.2f, false);
+	}
+}
+
+void AGameModeGMTK::BindPlayerRespawnEvents()
+{
+	APawn* Player1Pawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	APawn* Player2Pawn = UGameplayStatics::GetPlayerPawn(this, 1);
+
+	URespawnComponent* Respawn1 = Player1Pawn ? Player1Pawn->FindComponentByClass<URespawnComponent>() : nullptr;
+	URespawnComponent* Respawn2 = Player2Pawn ? Player2Pawn->FindComponentByClass<URespawnComponent>() : nullptr;
+
+	APlayerControllerBase* PC1 = Player1Pawn ? Cast<APlayerControllerBase>(Player1Pawn->GetController()) : nullptr;
+	APlayerControllerBase* PC2 = Player2Pawn ? Cast<APlayerControllerBase>(Player2Pawn->GetController()) : nullptr;
+
+	bool bBothBound = true;
+
+	if (Respawn1 && PC2)
+	{
+		Respawn1->OnPlayerDied.AddUniqueDynamic(PC2, &APlayerControllerBase::NotifyOpponentDied);
+	}
+	else
+	{
+		bBothBound = false;
+	}
+
+	if (Respawn2 && PC1)
+	{
+		Respawn2->OnPlayerDied.AddUniqueDynamic(PC1, &APlayerControllerBase::NotifyOpponentDied);
+	}
+	else
+	{
+		bBothBound = false;
+	}
+
+	if (!bBothBound)
+	{
+		GetWorldTimerManager().SetTimer(BindRespawnEventsRetryHandle, this, &AGameModeGMTK::BindPlayerRespawnEvents, 0.2f, false);
 	}
 }
 

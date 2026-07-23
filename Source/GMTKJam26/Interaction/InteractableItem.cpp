@@ -91,12 +91,15 @@ void AInteractableItem::OnMeshHit(UPrimitiveComponent* HitComponent, AActor* Oth
 	{
 		if (State == EInteractableItemState::Flying)
 		{
-			if (UPushComponent* HitPush = HitCharacter->FindComponentByClass<UPushComponent>())
+			if (HitCharacter != LastHolder.Get())
 			{
-				HitPush->ApplyKnockback(GetActorLocation(), ThrownHitPushForce, ThrownHitPushUpwardForce);
-			}
+				if (UPushComponent* HitPush = HitCharacter->FindComponentByClass<UPushComponent>())
+				{
+					HitPush->ApplyKnockback(GetActorLocation(), ThrownHitPushForce, ThrownHitPushUpwardForce);
+				}
 
-			OnHitCharacter.Broadcast(HitCharacter);
+				OnHitCharacter.Broadcast(HitCharacter);
+			}
 		}
 		else if (State == EInteractableItemState::Grounded)
 		{

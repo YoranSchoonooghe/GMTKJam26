@@ -7,6 +7,7 @@
 #include "Components/DashComponent.h"
 #include "Components/PickupComponent.h"
 #include "Components/ThrowComponent.h"
+#include "Components/RespawnComponent.h"
 #include "Menu/MenuFlowSubsystem.h"
 #include "Menu/States/MenuStateBase.h"
 #include "EnhancedInputComponent.h"
@@ -131,6 +132,16 @@ void APlayerControllerBase::HandleThrowRumble()
 	PlayRumbleEffect(ThrowRumbleEffect);
 }
 
+void APlayerControllerBase::HandleOwnDeathRumble(FVector DeathLocation)
+{
+	PlayRumbleEffect(DeathRumbleEffect);
+}
+
+void APlayerControllerBase::NotifyOpponentDied(FVector DeathLocation)
+{
+	PlayRumbleEffect(KillRumbleEffect);
+}
+
 void APlayerControllerBase::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
@@ -162,6 +173,11 @@ void APlayerControllerBase::OnPossess(APawn* InPawn)
 		if (UThrowComponent* Throw = ControlledCharacter->GetThrowComponent())
 		{
 			Throw->OnItemThrown.AddUniqueDynamic(this, &APlayerControllerBase::HandleThrowRumble);
+		}
+
+		if (URespawnComponent* Respawn = ControlledCharacter->GetRespawnComponent())
+		{
+			Respawn->OnPlayerDied.AddUniqueDynamic(this, &APlayerControllerBase::HandleOwnDeathRumble);
 		}
 	}
 

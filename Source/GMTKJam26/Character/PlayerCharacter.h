@@ -35,6 +35,7 @@ public:
 	UDropComponent* GetDropComponent() { return DropComponent; }
 	UPushComponent* GetPushComponent() { return PushComponent; }
 	UDashComponent* GetDashComponent() { return DashComponent; }
+	URespawnComponent* GetRespawnComponent() { return RespawnComponent; }
 
 protected:
 	virtual void BeginPlay() override;

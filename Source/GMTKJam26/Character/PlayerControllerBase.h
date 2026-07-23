@@ -30,6 +30,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Rumble")
 	void NotifyItemBumped();
 
+	UFUNCTION(BlueprintCallable, Category = "Rumble")
+	void NotifyOpponentDied(FVector DeathLocation);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -78,6 +81,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Rumble")
 	TObjectPtr<UForceFeedbackEffect> ItemBumpRumbleEffect;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Rumble")
+	TObjectPtr<UForceFeedbackEffect> DeathRumbleEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Rumble")
+	TObjectPtr<UForceFeedbackEffect> KillRumbleEffect;
+
 private:
 	void Move(const FInputActionValue& Value);
 	void StartJump();
@@ -100,6 +109,9 @@ private:
 
 	UFUNCTION()
 	void HandleThrowRumble();
+
+	UFUNCTION()
+	void HandleOwnDeathRumble(FVector DeathLocation);
 
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> ControlledCharacter;

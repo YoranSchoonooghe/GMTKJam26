@@ -25,6 +25,7 @@ protected:
 
 private:
 	void BindPlayerTimerEvents();
+	void BindPlayerRespawnEvents();
 
 	UFUNCTION()
 	void HandlePlayer1TimerExpired();
@@ -38,4 +39,5 @@ private:
 	bool bGameOverTriggered = false;
 
 	FTimerHandle BindTimerEventsRetryHandle;
+	FTimerHandle BindRespawnEventsRetryHandle;
 };
