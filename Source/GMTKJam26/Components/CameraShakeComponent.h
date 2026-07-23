@@ -16,12 +16,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Camera")
-	TSubclassOf<UCameraShakeBase> CameraShake;
-
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Camera Shake")
-	void ShakeCamera();
+	void ShakeCamera(TSubclassOf<UCameraShakeBase> ShakeClass, float Scale = 1.0f);
 };

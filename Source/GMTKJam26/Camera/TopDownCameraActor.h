@@ -24,7 +24,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraShakeComponent> CameraShakeComponent;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Camera")
+	TSubclassOf<UCameraShakeBase> DeathCameraShake;
+	UPROPERTY(EditDefaultsOnly, Category = "Camera")
+	TSubclassOf<UCameraShakeBase> ItemPlacementCameraShake;
+
 private:
 	UFUNCTION()
-	void RequestCameraShake();
+	void RequestDeathCameraShake();
+	UFUNCTION()
+	void RequestItemPlacementCameraShake();
 };

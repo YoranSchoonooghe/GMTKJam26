@@ -20,11 +20,16 @@ void ATopDownCameraActor::BeginPlay()
 	Super::BeginPlay();
 
 	auto* pEventBus = GetWorld()->GetSubsystem<UEventBusSubsystem>();
-	pEventBus->OnRobotPartAttached.AddDynamic(this, &ATopDownCameraActor::RequestCameraShake);
-	pEventBus->OnPlayerDied.AddDynamic(this, &ATopDownCameraActor::RequestCameraShake);
+	pEventBus->OnRobotPartAttached.AddDynamic(this, &ATopDownCameraActor::RequestItemPlacementCameraShake);
+	pEventBus->OnPlayerDied.AddDynamic(this, &ATopDownCameraActor::RequestDeathCameraShake);
 }
 
-void ATopDownCameraActor::RequestCameraShake()
+void ATopDownCameraActor::RequestDeathCameraShake()
 {
-	CameraShakeComponent->ShakeCamera();
+	CameraShakeComponent->ShakeCamera(DeathCameraShake);
+}
+
+void ATopDownCameraActor::RequestItemPlacementCameraShake()
+{
+	CameraShakeComponent->ShakeCamera(ItemPlacementCameraShake);
 }
