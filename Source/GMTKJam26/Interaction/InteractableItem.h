@@ -48,6 +48,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Interaction")
 	AActor* GetLastHolder() const { return LastHolder.Get(); }
 
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	void SetHighlight(bool highlighted);
+
 	UPROPERTY(BlueprintAssignable, Category = "Interaction")
 	FOnItemLandedSignature OnLanded;
 	UPROPERTY(BlueprintAssignable, Category = "Interaction")
@@ -69,6 +72,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> Mesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Interaction")
+	TObjectPtr<UMaterialInterface> OutlineMaterial;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
 	float PickupCooldown = 0.2f;
