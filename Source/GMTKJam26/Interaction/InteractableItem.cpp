@@ -24,6 +24,9 @@ void AInteractableItem::BeginPlay()
 
 bool AInteractableItem::CanBePickedUp() const
 {
+	if (State == EInteractableItemState::Attached)
+		return false;
+
 	return bCanBePickedUp && State != EInteractableItemState::Held;
 }
 
