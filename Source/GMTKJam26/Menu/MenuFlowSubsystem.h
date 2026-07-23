@@ -30,7 +30,18 @@ public:
 
 	APlayerController* GetFirstPlayerController() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Menu Flow")
+	void RestartLevel();
+
+	UFUNCTION(BlueprintCallable, Category = "Menu Flow")
+	void SetGameOverWinnerIndex(int32 InWinningPlayerIndex) { WinningPlayerIndex = InWinningPlayerIndex; }
+
+	UFUNCTION(BlueprintPure, Category = "Menu Flow")
+	int32 GetGameOverWinnerIndex() const { return WinningPlayerIndex; }
+
 private:
 	UPROPERTY()
 	TArray<TObjectPtr<UMenuStateBase>> StateStack;
+
+	int32 WinningPlayerIndex = -1;
 };

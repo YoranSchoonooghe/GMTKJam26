@@ -73,3 +73,11 @@ APlayerController* UMenuFlowSubsystem::GetFirstPlayerController() const
 {
 	return UGameplayStatics::GetPlayerController(GetGameInstance()->GetWorld(), 0);
 }
+
+void UMenuFlowSubsystem::RestartLevel()
+{
+	if (UWorld* World = GetGameInstance() ? GetGameInstance()->GetWorld() : nullptr)
+	{
+		UGameplayStatics::OpenLevel(World, FName(*World->GetName()));
+	}
+}
