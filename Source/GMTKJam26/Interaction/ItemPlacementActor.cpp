@@ -108,9 +108,12 @@ void AItemPlacementActor::TryAttach()
 	PreviewMesh->SetHiddenInGame(true);
 	InteractWidget->SetHiddenInGame(true);
 
-	if (!_bPlayerIsInRange) return;
 	if (!_targetItem) return;
-	if (_targetItem->GetPartType() != ExpectedPartType) return;
+	if (!_bPlayerIsInRange || _targetItem->GetPartType() != ExpectedPartType)
+	{
+		_targetItem = nullptr;
+		return;
+	}
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Item entered trigger");
 
