@@ -40,6 +40,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Interaction")
 	EInteractableItemState GetItemState() const { return State; }
 
+	UFUNCTION(BlueprintPure, Category = "Interaction")
+	AActor* GetLastHolder() const { return LastHolder.Get(); }
+
 	UPROPERTY(BlueprintAssignable, Category = "Interaction")
 	FOnItemLandedSignature OnLanded;
 	UPROPERTY(BlueprintAssignable, Category = "Interaction")
@@ -63,4 +66,6 @@ private:
 	EInteractableItemState State = EInteractableItemState::Grounded;
 	bool bCanBePickedUp = true;
 	FTimerHandle PickupCooldownTimerHandle;
+
+	TWeakObjectPtr<AActor> LastHolder;
 };

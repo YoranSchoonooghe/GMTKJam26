@@ -6,6 +6,9 @@
 #include "GMTKJam26/Components/ThrowComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/WidgetComponent.h"
+#include "RobotPart.h"
+#include "Character/PlayerCharacter.h"
+#include "Components/PlayerTimerComponent.h"
 
 AItemPlacementActor::AItemPlacementActor()
 {
@@ -96,7 +99,8 @@ void AItemPlacementActor::OnEndOverlap(UPrimitiveComponent* OverlappedComponent,
 	{
 		_bPlayerIsInRange = false;
 		InteractWidget->SetHiddenInGame(true);
-	}
+
+		}
 }
 
 void AItemPlacementActor::Tick(float DeltaTime)
@@ -130,5 +134,16 @@ void AItemPlacementActor::TryAttach()
 	_targetItem->SnapToAttachPoint(PreviewMesh->GetComponentLocation(), PreviewMesh->GetComponentRotation());
 	_bHasItem = true;
 	PreviewMesh->SetHiddenInGame(true);
+
+	if (ARobotPart* RobotPart = Cast<ARobotPart>(_targetItem))
+	{
+		if (APlayerCharacter* HolderCharacter = Cast<APlayerCharacter>(RobotPart->GetLastHolder()))
+		{
+			if (UPlayerTimerComponent* TimerComponent = HolderCharacter->GetTimerComponent())
+			{
+				TimerComponent->AddItem(RobotPart);
+			}
+		}
+	}
 }
 

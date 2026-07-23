@@ -38,6 +38,7 @@ void AInteractableItem::OnPickedUp(USceneComponent* AttachTo, FName SocketName)
 	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AttachToComponent(AttachTo, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 
+	LastHolder = AttachTo->GetOwner();
 	State = EInteractableItemState::Held;
 }
 

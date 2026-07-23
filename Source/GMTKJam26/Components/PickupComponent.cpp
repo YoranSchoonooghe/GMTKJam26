@@ -18,6 +18,8 @@ void UPickupComponent::BeginPlay()
 		InteractionZone->SetBoxExtent(InteractionZoneExtent);
 		InteractionZone->SetRelativeLocation(InteractionZoneOffset);
 		InteractionZone->SetCollisionProfileName(FName("OverlapAllDynamic"));
+		InteractionZone->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Ignore);
+		InteractionZone->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
 		InteractionZone->RegisterComponent();
 		InteractionZone->AttachToComponent(Owner->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	}
