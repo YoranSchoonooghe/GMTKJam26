@@ -21,10 +21,10 @@ void UCameraShakeComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 }
 
-void UCameraShakeComponent::ShakeCamera()
+void UCameraShakeComponent::ShakeCamera(TSubclassOf<UCameraShakeBase> ShakeClass, float Scale)
 {
 	if (auto* pPlayerController = GetWorld()->GetFirstPlayerController())
 	{
-		pPlayerController->PlayerCameraManager->StartCameraShake(CameraShake);
+		pPlayerController->PlayerCameraManager->StartCameraShake(ShakeClass, Scale);
 	}
 }

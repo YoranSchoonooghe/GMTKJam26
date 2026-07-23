@@ -3,6 +3,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "UI/RespawnCountdownWidget.h"
+#include "GMTKJam26/Events/EventBusSubsystem.h"
 
 URespawnComponent::URespawnComponent()
 {
@@ -77,6 +78,7 @@ void URespawnComponent::HandleFallIntoVoid()
 	GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &URespawnComponent::Respawn, RespawnDelay, false);
 
 	OnPlayerDied.Broadcast(DeathLocation);
+	GetWorld()->GetSubsystem<UEventBusSubsystem>()->SendEvent("OnPlayerDied");
 }
 
 void URespawnComponent::Respawn()
