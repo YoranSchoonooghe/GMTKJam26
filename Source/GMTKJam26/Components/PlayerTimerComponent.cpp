@@ -1,5 +1,6 @@
 #include "PlayerTimerComponent.h"
 #include "Interaction/RobotPart.h"
+#include "Events/EventBusSubsystem.h"
 
 UPlayerTimerComponent::UPlayerTimerComponent()
 {
@@ -42,6 +43,7 @@ void UPlayerTimerComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		bExpired = true;
 		OnTimerExpired.Broadcast();
+		GetWorld()->GetSubsystem<UEventBusSubsystem>()->SendEvent("OnRobotTimeExpired");
 		return;
 	}
 

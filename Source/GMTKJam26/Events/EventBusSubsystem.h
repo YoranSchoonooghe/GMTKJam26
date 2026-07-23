@@ -20,4 +20,8 @@ public:
 	UPROPERTY()
 	FOnPlayerDied OnPlayerDied;
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRobotTimeExpired);
+	UPROPERTY()
+	FOnRobotTimeExpired OnRobotTimeExpired;
+
 };

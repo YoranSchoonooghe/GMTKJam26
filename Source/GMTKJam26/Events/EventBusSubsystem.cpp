@@ -6,4 +6,6 @@ void UEventBusSubsystem::SendEvent(FName EventName)
 		OnPlayerDied.Broadcast();
 	else if (EventName == TEXT("OnRobotPartAttached"))
 		OnRobotPartAttached.Broadcast();
+	else if (EventName == TEXT("OnRobotTimeExpired"))
+		OnRobotTimeExpired.Broadcast();
 }
