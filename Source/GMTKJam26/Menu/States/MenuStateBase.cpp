@@ -1,6 +1,7 @@
 #include "MenuStateBase.h"
 #include "../MenuFlowSubsystem.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/BaseFocusWidget.h"
 #include "GameFramework/PlayerController.h"
 
 void UMenuStateBase::EnterState(UMenuFlowSubsystem* Flow)
@@ -21,12 +22,17 @@ void UMenuStateBase::EnterState(UMenuFlowSubsystem* Flow)
 	}
 
 	PC->SetPause(bPausesGame);
+
+	if (Cast<UBaseFocusWidget>(ActiveWidget))
+	{
+		return;
+	}
+
 	PC->SetShowMouseCursor(bShowsMouseCursor);
 
 	if (bShowsMouseCursor)
 	{
 		FInputModeGameAndUI InputMode;
-
 		InputMode.SetHideCursorDuringCapture(false);
 
 		if (ActiveWidget)
