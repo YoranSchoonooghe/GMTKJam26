@@ -141,6 +141,8 @@ void AItemPlacementActor::TryAttach()
 				PC->NotifyItemPlaced();
 			}
 		}
+
+		OnItemPlaced.Broadcast(RobotPart);
 	}
 }
 

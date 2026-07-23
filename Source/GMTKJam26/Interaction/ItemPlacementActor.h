@@ -9,13 +9,18 @@ class UBoxComponent;
 class UWidgetComponent;
 class APlayerCharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemPlacedSignature, ARobotPart*, PlacedItem);
+
 UCLASS()
 class GMTKJAM26_API AItemPlacementActor : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	AItemPlacementActor();
+
+	UPROPERTY(BlueprintAssignable, Category = "Placement")
+	FOnItemPlacedSignature OnItemPlaced;
 
 protected:
 	virtual void BeginPlay() override;

@@ -9,6 +9,8 @@ class UMenuStateBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameOverSequenceStartedSignature, APawn*, LosingPawn);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameOverSequenceEndedSignature, int32, WinningPlayerIndex);
+
 UCLASS()
 class GMTKJAM26_API AGameModeGMTK : public AGameModeBase
 {
@@ -17,6 +19,9 @@ class GMTKJAM26_API AGameModeGMTK : public AGameModeBase
 public:
 	UPROPERTY(BlueprintAssignable, Category = "GameOver")
 	FOnGameOverSequenceStartedSignature OnGameOverSequenceStarted;
+
+	UPROPERTY(BlueprintAssignable, Category = "GameOver")
+	FOnGameOverSequenceEndedSignature OnGameOverSequenceEnded;
 
 protected:
 	virtual void BeginPlay() override;

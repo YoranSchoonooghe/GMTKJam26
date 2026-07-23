@@ -223,6 +223,11 @@ void ASplineConveyorBelt::Tick(float DeltaTime)
 				RootPrimitive->SetEnableGravity(true);
 			}
 
+			if (AInteractableItem* ExitedItem = Cast<AInteractableItem>(Actor))
+			{
+				OnItemExitedBelt.Broadcast(ExitedItem);
+			}
+
 			RidingProgress.Remove(ActorKey);
 			continue;
 		}

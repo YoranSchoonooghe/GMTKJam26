@@ -31,6 +31,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Conveyor|Events")
 	FOnItemSpawnedSignature OnItemSpawned;
 
+	UPROPERTY(BlueprintAssignable, Category = "Conveyor|Events")
+	FOnItemSpawnedSignature OnItemExitedBelt;
+
 protected:
 	virtual void BeginPlay() override;
 

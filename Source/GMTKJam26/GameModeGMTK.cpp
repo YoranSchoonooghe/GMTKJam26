@@ -145,6 +145,8 @@ void AGameModeGMTK::HandleGameOver(int32 LosingPlayerIndex)
 
 void AGameModeGMTK::ShowGameOverMenu()
 {
+	OnGameOverSequenceEnded.Broadcast(PendingWinningPlayerIndex);
+
 	if (UMenuFlowSubsystem* Flow = GetGameInstance() ? GetGameInstance()->GetSubsystem<UMenuFlowSubsystem>() : nullptr)
 	{
 		Flow->SetGameOverWinnerIndex(PendingWinningPlayerIndex);
