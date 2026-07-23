@@ -72,6 +72,8 @@ void AInteractableItem::SnapToAttachPoint(const FVector& Location, const FRotato
 	SetActorRotation(Rotation);
 
 	bCanBePickedUp = false;
+
+	OnAttached.Broadcast(Location);
 }
 
 void AInteractableItem::OnMeshHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

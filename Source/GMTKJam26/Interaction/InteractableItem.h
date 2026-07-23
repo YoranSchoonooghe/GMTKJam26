@@ -16,6 +16,7 @@ enum class EInteractableItemState : uint8
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemLandedSignature, FVector, HitLocation);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAttachedSignature, FVector, AttachLocation);
 
 UCLASS()
 class GMTKJAM26_API AInteractableItem : public AActor
@@ -41,6 +42,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Interaction")
 	FOnItemLandedSignature OnLanded;
+	UPROPERTY(BlueprintAssignable, Category = "Interaction")
+	FOnItemAttachedSignature OnAttached;
 
 protected:
 	virtual void BeginPlay() override;

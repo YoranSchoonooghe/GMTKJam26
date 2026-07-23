@@ -26,6 +26,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Timer")
 	UPlayerTimerComponent* GetTimerComponent() const { return TimerComponent; }
 
+	UPickupComponent* GetPickupComponent() { return PickupComponent; }
+	UThrowComponent* GetThrowComponent() { return ThrowComponent; }
+
 protected:
 	virtual void BeginPlay() override;
 

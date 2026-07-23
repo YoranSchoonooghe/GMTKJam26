@@ -1,6 +1,11 @@
 #include "ItemPlacementActor.h"
 #include "Components/BoxComponent.h"
 #include "InteractableItem.h"
+#include "GMTKJam26/Character/PlayerCharacter.h"
+#include "GMTKJam26/Components/PickupComponent.h"
+#include "GMTKJam26/Components/ThrowComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/WidgetComponent.h"
 
 AItemPlacementActor::AItemPlacementActor()
 {
@@ -9,21 +14,41 @@ AItemPlacementActor::AItemPlacementActor()
 	auto* pRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = pRoot;
 
-	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnVolume"));
+	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerZone"));
 	TriggerBox->SetupAttachment(pRoot);
 
 	PreviewMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PreviewMesh"));
 	PreviewMesh->SetupAttachment(pRoot);
 	PreviewMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	InteractWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractWidget"));
+	InteractWidget->SetupAttachment(pRoot);
+	InteractWidget->SetHiddenInGame(true);
+
 	TriggerBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AItemPlacementActor::OnBeginOverlap);
+	TriggerBox->OnComponentEndOverlap.AddDynamic(this, &AItemPlacementActor::OnEndOverlap);
 }
 
 void AItemPlacementActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	PreviewMesh->SetHiddenInGame(true);
+
+	auto Player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (Player)
+	{
+		if (auto* pPickupComponent = Player->GetPickupComponent())
+		{
+			pPickupComponent->OnItemPickedUp.AddDynamic(this, &AItemPlacementActor::ShowAttachHint);
+			pPickupComponent->OnItemDropped.AddDynamic(this, &AItemPlacementActor::TryAttach);
+		}
+		if (auto* pThrowComponent = Player->GetThrowComponent())
+		{
+			pThrowComponent->OnItemThrown.AddDynamic(this, &AItemPlacementActor::TryAttach);
+		}
+	}
 }
 
 void AItemPlacementActor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -31,31 +56,79 @@ void AItemPlacementActor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponen
 {
 	if (_bHasItem) return;
 
-	auto* pItem = Cast<AInteractableItem>(OtherActor);
-	if (!pItem) return;
+	if (auto* pPlayer = Cast<APlayerCharacter>(OtherActor))
+	{
+		_bPlayerIsInRange = true;
 
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Item entered trigger");
-
-	FTimerHandle TimerHandle;
-
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle,
-		[this, pItem]()
+		if (auto* pItem = pPlayer->GetPickupComponent()->GetHeldItem())
 		{
-			if (!IsValid(this) || !IsValid(pItem))
-				return;
+			_targetItem = pItem;
+			InteractWidget->SetHiddenInGame(false);
+		}
+	}
 
-			pItem->SnapToAttachPoint(GetActorLocation(), GetActorRotation());
-			_bHasItem = true;
-			PreviewMesh->SetHiddenInGame(true);
-		},
-		0.05f,
-		false
-	);
+	//auto* pItem = Cast<AInteractableItem>(OtherActor);
+	//if (!pItem) return;
+
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Item entered trigger");
+
+	//FTimerHandle TimerHandle;
+
+	//GetWorld()->GetTimerManager().SetTimer(TimerHandle,
+	//	[this, pItem]()
+	//	{
+	//		if (!IsValid(this) || !IsValid(pItem))
+	//			return;
+
+	//		pItem->SnapToAttachPoint(PreviewMesh->GetComponentLocation(), PreviewMesh->GetComponentRotation());
+	//		_bHasItem = true;
+	//		PreviewMesh->SetHiddenInGame(true);
+	//	},
+	//	0.05f,
+	//	false
+	//);
+}
+
+void AItemPlacementActor::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (Cast<APlayerCharacter>(OtherActor))
+	{
+		_bPlayerIsInRange = false;
+		InteractWidget->SetHiddenInGame(true);
+	}
 }
 
 void AItemPlacementActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AItemPlacementActor::ShowAttachHint()
+{
+	if (_bHasItem) return;
+
+	PreviewMesh->SetHiddenInGame(false);
+}
+
+void AItemPlacementActor::HideAttachHint()
+{
+	PreviewMesh->SetHiddenInGame(true);
+}
+
+void AItemPlacementActor::TryAttach()
+{
+	PreviewMesh->SetHiddenInGame(true);
+	InteractWidget->SetHiddenInGame(true);
+
+	if (!_bPlayerIsInRange) return;
+	if (!_targetItem) return;
+
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Item entered trigger");
+
+	_targetItem->SnapToAttachPoint(PreviewMesh->GetComponentLocation(), PreviewMesh->GetComponentRotation());
+	_bHasItem = true;
+	PreviewMesh->SetHiddenInGame(true);
 }
 
