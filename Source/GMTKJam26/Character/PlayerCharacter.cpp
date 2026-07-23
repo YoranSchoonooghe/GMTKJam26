@@ -4,6 +4,7 @@
 #include "Components/PickupComponent.h"
 #include "Components/ThrowComponent.h"
 #include "Components/PlayerTimerComponent.h"
+#include "Components/PushComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -23,6 +24,7 @@ APlayerCharacter::APlayerCharacter()
 	PickupComponent = CreateDefaultSubobject<UPickupComponent>(TEXT("PickupComponent"));
 	ThrowComponent = CreateDefaultSubobject<UThrowComponent>(TEXT("ThrowComponent"));
 	TimerComponent = CreateDefaultSubobject<UPlayerTimerComponent>(TEXT("TimerComponent"));
+	PushComponent = CreateDefaultSubobject<UPushComponent>(TEXT("PushComponent"));
 }
 
 void APlayerCharacter::BeginPlay()
@@ -67,11 +69,15 @@ void APlayerCharacter::RequestInteract()
 		{
 			ThrowComponent->ThrowHeldItem();
 		}
+		return;
 	}
-	else
+
+	if (PushComponent && PushComponent->TryShoveNearbyPlayer())
 	{
-		PickupComponent->TryPickup();
+		return;
 	}
+
+	PickupComponent->TryPickup();
 }
 
 void APlayerCharacter::RequestDrop()

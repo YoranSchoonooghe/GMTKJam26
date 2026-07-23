@@ -57,6 +57,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
 	float PickupCooldown = 0.2f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction|Push")
+	float ThrownHitPushForce = 500.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction|Push")
+	float ThrownHitPushUpwardForce = 150.f;
+
 private:
 	UFUNCTION()
 	void OnMeshHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

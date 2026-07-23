@@ -1,5 +1,7 @@
 #include "InteractableItem.h"
 #include "Components/StaticMeshComponent.h"
+#include "GameFramework/Character.h"
+#include "Components/PushComponent.h"
 
 AInteractableItem::AInteractableItem()
 {
@@ -81,6 +83,16 @@ void AInteractableItem::OnMeshHit(UPrimitiveComponent* HitComponent, AActor* Oth
 {
 	if (State != EInteractableItemState::Flying)
 	{
+		return;
+	}
+
+	if (ACharacter* HitCharacter = Cast<ACharacter>(OtherActor))
+	{
+		if (UPushComponent* HitPush = HitCharacter->FindComponentByClass<UPushComponent>())
+		{
+			HitPush->ApplyKnockback(GetActorLocation(), ThrownHitPushForce, ThrownHitPushUpwardForce);
+		}
+
 		return;
 	}
 

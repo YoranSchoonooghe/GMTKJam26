@@ -8,6 +8,7 @@ class UDashComponent;
 class UPickupComponent;
 class UThrowComponent;
 class UPlayerTimerComponent;
+class UPushComponent;
 
 UCLASS()
 class GMTKJAM26_API APlayerCharacter : public ACharacter
@@ -47,4 +48,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timer", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UPlayerTimerComponent> TimerComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Push", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UPushComponent> PushComponent;
 };

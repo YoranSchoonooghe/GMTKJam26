@@ -38,14 +38,24 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dash")
 	float DashCooldown = 1.f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dash|Push")
+	float PushForce = 900.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dash|Push")
+	float PushUpwardForce = 200.f;
+
 private:
 	void StopDash();
 	void ResetDash();
+
+	UFUNCTION()
+	void OnCharacterHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
 
 	TWeakObjectPtr<ACharacter> OwningCharacter;
 
 	bool bIsDashing = false;
 	bool bCanDash = true;
+	bool bHasPushedThisDash = false;
 	FVector CurrentDashDirection = FVector::ZeroVector;
 
 	FTimerHandle DashDurationTimerHandle;
