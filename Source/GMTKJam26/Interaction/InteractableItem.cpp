@@ -2,6 +2,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Character.h"
 #include "Components/PushComponent.h"
+#include "GMTKJam26/Character/PlayerControllerBase.h"
 
 AInteractableItem::AInteractableItem()
 {
@@ -86,19 +87,32 @@ void AInteractableItem::SnapToAttachPoint(const FVector& Location, const FRotato
 
 void AInteractableItem::OnMeshHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (State != EInteractableItemState::Flying)
+	if (ACharacter* HitCharacter = Cast<ACharacter>(OtherActor))
 	{
+		if (State == EInteractableItemState::Flying)
+		{
+			if (UPushComponent* HitPush = HitCharacter->FindComponentByClass<UPushComponent>())
+			{
+				HitPush->ApplyKnockback(GetActorLocation(), ThrownHitPushForce, ThrownHitPushUpwardForce);
+			}
+
+			OnHitCharacter.Broadcast(HitCharacter);
+		}
+		else if (State == EInteractableItemState::Grounded)
+		{
+			if (APlayerControllerBase* PC = Cast<APlayerControllerBase>(HitCharacter->GetController()))
+			{
+				PC->NotifyItemBumped();
+			}
+
+			OnBumpedByCharacter.Broadcast(HitCharacter);
+		}
+
 		return;
 	}
 
-	if (ACharacter* HitCharacter = Cast<ACharacter>(OtherActor))
+	if (State != EInteractableItemState::Flying)
 	{
-		if (UPushComponent* HitPush = HitCharacter->FindComponentByClass<UPushComponent>())
-		{
-			HitPush->ApplyKnockback(GetActorLocation(), ThrownHitPushForce, ThrownHitPushUpwardForce);
-		}
-
-		OnHitCharacter.Broadcast(HitCharacter);
 		return;
 	}
 

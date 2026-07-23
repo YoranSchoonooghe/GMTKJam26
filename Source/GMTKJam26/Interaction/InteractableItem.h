@@ -21,6 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemLandedSignature, FVector, Hit
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAttachedSignature, FVector, AttachLocation);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnItemFlightStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemHitCharacterSignature, ACharacter*, HitCharacter);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBumpedByCharacterSignature, ACharacter*, BumpingCharacter);
 
 UCLASS()
 class GMTKJAM26_API AInteractableItem : public AActor
@@ -59,6 +60,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Interaction")
 	FOnItemHitCharacterSignature OnHitCharacter;
+
+	UPROPERTY(BlueprintAssignable, Category = "Interaction")
+	FOnBumpedByCharacterSignature OnBumpedByCharacter;
 
 protected:
 	virtual void BeginPlay() override;

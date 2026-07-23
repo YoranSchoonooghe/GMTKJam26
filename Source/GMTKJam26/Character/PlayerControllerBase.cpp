@@ -3,11 +3,17 @@
 #include "Camera/TopDownCameraActor.h"
 #include "UI/PlayerTimerWidget.h"
 #include "Components/PlayerTimerComponent.h"
+#include "Components/PushComponent.h"
+#include "Components/DashComponent.h"
+#include "Components/PickupComponent.h"
+#include "Components/ThrowComponent.h"
 #include "Menu/MenuFlowSubsystem.h"
 #include "Menu/States/MenuStateBase.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/ForceFeedbackEffect.h"
+#include "GameFramework/ForceFeedbackParameters.h"
 
 void APlayerControllerBase::BeginPlay()
 {
@@ -72,11 +78,92 @@ void APlayerControllerBase::SetupInputComponent()
 	}
 }
 
+void APlayerControllerBase::PlayRumble(float Intensity, float Duration, bool bAffectsLeftLarge, bool bAffectsLeftSmall, bool bAffectsRightLarge, bool bAffectsRightSmall)
+{
+	PlayDynamicForceFeedback(Intensity, Duration, bAffectsLeftLarge, bAffectsLeftSmall, bAffectsRightLarge, bAffectsRightSmall, EDynamicForceFeedbackAction::Start, FLatentActionInfo());
+}
+
+void APlayerControllerBase::PlayRumbleEffect(UForceFeedbackEffect* Effect, bool bLooping, FName Tag)
+{
+	if (!Effect)
+	{
+		return;
+	}
+
+	FForceFeedbackParameters Params;
+	Params.Tag = Tag;
+	Params.bLooping = bLooping;
+	ClientPlayForceFeedback(Effect, Params);
+}
+
+void APlayerControllerBase::StopRumbleEffect(FName Tag)
+{
+	ClientStopForceFeedback(nullptr, Tag);
+}
+
+void APlayerControllerBase::NotifyItemBumped()
+{
+	PlayRumbleEffect(ItemBumpRumbleEffect);
+}
+
+void APlayerControllerBase::HandleKnockbackRumble(FVector SourceLocation)
+{
+	PlayRumbleEffect(KnockbackRumbleEffect);
+}
+
+void APlayerControllerBase::HandleDashHitRumble(ACharacter* HitCharacter)
+{
+	PlayRumbleEffect(DashHitRumbleEffect);
+}
+
+void APlayerControllerBase::HandleSegmentDepletedRumble(int32 SegmentIndex)
+{
+	PlayRumbleEffect(SegmentDepletedRumbleEffect);
+}
+
+void APlayerControllerBase::HandlePickupRumble()
+{
+	PlayRumbleEffect(PickupRumbleEffect);
+}
+
+void APlayerControllerBase::HandleThrowRumble()
+{
+	PlayRumbleEffect(ThrowRumbleEffect);
+}
+
 void APlayerControllerBase::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
 	ControlledCharacter = Cast<APlayerCharacter>(InPawn);
+
+	if (ControlledCharacter)
+	{
+		if (UPushComponent* Push = ControlledCharacter->GetPushComponent())
+		{
+			Push->OnKnockback.AddUniqueDynamic(this, &APlayerControllerBase::HandleKnockbackRumble);
+		}
+
+		if (UDashComponent* Dash = ControlledCharacter->GetDashComponent())
+		{
+			Dash->OnDashHitCharacter.AddUniqueDynamic(this, &APlayerControllerBase::HandleDashHitRumble);
+		}
+
+		if (UPlayerTimerComponent* Timer = ControlledCharacter->GetTimerComponent())
+		{
+			Timer->OnSegmentDepleted.AddUniqueDynamic(this, &APlayerControllerBase::HandleSegmentDepletedRumble);
+		}
+
+		if (UPickupComponent* Pickup = ControlledCharacter->GetPickupComponent())
+		{
+			Pickup->OnItemPickedUp.AddUniqueDynamic(this, &APlayerControllerBase::HandlePickupRumble);
+		}
+
+		if (UThrowComponent* Throw = ControlledCharacter->GetThrowComponent())
+		{
+			Throw->OnItemThrown.AddUniqueDynamic(this, &APlayerControllerBase::HandleThrowRumble);
+		}
+	}
 
 	if (ControlledCharacter && TimerWidgetClass && IsLocalPlayerController())
 	{

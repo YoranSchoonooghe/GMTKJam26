@@ -10,11 +10,25 @@ class UInputAction;
 class APlayerCharacter;
 class UPlayerTimerWidget;
 class UMenuStateBase;
+class UForceFeedbackEffect;
 
 UCLASS()
 class GMTKJAM26_API APlayerControllerBase : public APlayerController
 {
 	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "Rumble")
+	void PlayRumble(float Intensity = 0.5f, float Duration = 0.2f, bool bAffectsLeftLarge = true, bool bAffectsLeftSmall = true, bool bAffectsRightLarge = true, bool bAffectsRightSmall = true);
+
+	UFUNCTION(BlueprintCallable, Category = "Rumble")
+	void PlayRumbleEffect(UForceFeedbackEffect* Effect, bool bLooping = false, FName Tag = NAME_None);
+
+	UFUNCTION(BlueprintCallable, Category = "Rumble")
+	void StopRumbleEffect(FName Tag);
+
+	UFUNCTION(BlueprintCallable, Category = "Rumble")
+	void NotifyItemBumped();
 
 protected:
 	virtual void BeginPlay() override;
@@ -46,6 +60,24 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> InteractAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Rumble")
+	TObjectPtr<UForceFeedbackEffect> KnockbackRumbleEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Rumble")
+	TObjectPtr<UForceFeedbackEffect> DashHitRumbleEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Rumble")
+	TObjectPtr<UForceFeedbackEffect> SegmentDepletedRumbleEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Rumble")
+	TObjectPtr<UForceFeedbackEffect> PickupRumbleEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Rumble")
+	TObjectPtr<UForceFeedbackEffect> ThrowRumbleEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Rumble")
+	TObjectPtr<UForceFeedbackEffect> ItemBumpRumbleEffect;
+
 private:
 	void Move(const FInputActionValue& Value);
 	void StartJump();
@@ -53,6 +85,21 @@ private:
 	void StartDash();
 	void StartInteract();
 	void RequestPauseToggle();
+
+	UFUNCTION()
+	void HandleKnockbackRumble(FVector SourceLocation);
+
+	UFUNCTION()
+	void HandleDashHitRumble(class ACharacter* HitCharacter);
+
+	UFUNCTION()
+	void HandleSegmentDepletedRumble(int32 SegmentIndex);
+
+	UFUNCTION()
+	void HandlePickupRumble();
+
+	UFUNCTION()
+	void HandleThrowRumble();
 
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> ControlledCharacter;

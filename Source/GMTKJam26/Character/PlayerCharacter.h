@@ -32,6 +32,8 @@ public:
 	UPickupComponent* GetPickupComponent() { return PickupComponent; }
 	UThrowComponent* GetThrowComponent() { return ThrowComponent; }
 	UDropComponent* GetDropComponent() { return DropComponent; }
+	UPushComponent* GetPushComponent() { return PushComponent; }
+	UDashComponent* GetDashComponent() { return DashComponent; }
 
 protected:
 	virtual void BeginPlay() override;
