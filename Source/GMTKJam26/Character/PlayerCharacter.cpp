@@ -20,7 +20,7 @@ APlayerCharacter::APlayerCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
 
 	DashComponent = CreateDefaultSubobject<UDashComponent>(TEXT("DashComponent"));
 	PickupComponent = CreateDefaultSubobject<UPickupComponent>(TEXT("PickupComponent"));
@@ -34,11 +34,28 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PickupComponent->OnItemPickedUp.AddDynamic(this, &APlayerCharacter::UpdateWalkSpeed);
+	PickupComponent->OnItemDropped.AddDynamic(this, &APlayerCharacter::UpdateWalkSpeed);
+	ThrowComponent->OnItemThrown.AddDynamic(this, &APlayerCharacter::UpdateWalkSpeed);
+	DropComponent->OnItemLost.AddDynamic(this, &APlayerCharacter::UpdateWalkSpeed);
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void APlayerCharacter::UpdateWalkSpeed()
+{
+	if (PickupComponent->IsHoldingItem())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = CarryWalkSpeed;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+	}
 }
 
 void APlayerCharacter::Move(const FVector2D& MovementVector)

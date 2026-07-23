@@ -36,6 +36,11 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
+	float MaxWalkSpeed{ 600.0f };
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
+	float CarryWalkSpeed{ 300.0f };
+
 public:
 	virtual void Tick(float DeltaTime) override;
 
@@ -60,4 +65,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Drop", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDropComponent> DropComponent;
+
+	UFUNCTION()
+	void UpdateWalkSpeed();
 };
