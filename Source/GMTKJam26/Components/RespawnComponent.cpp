@@ -4,6 +4,7 @@
 #include "GameFramework/PlayerController.h"
 #include "UI/RespawnCountdownWidget.h"
 #include "GMTKJam26/Events/EventBusSubsystem.h"
+#include "Components/PlayerTimerComponent.h"
 
 URespawnComponent::URespawnComponent()
 {
@@ -45,6 +46,11 @@ void URespawnComponent::HandleFallIntoVoid()
 	}
 
 	bIsDead = true;
+
+	if (UPlayerTimerComponent* TimerComponent = OwningCharacter->FindComponentByClass<UPlayerTimerComponent>())
+	{
+		TimerComponent->ApplyDeathPenalty();
+	}
 
 	const FVector DeathLocation = OwningCharacter->GetActorLocation();
 

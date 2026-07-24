@@ -44,6 +44,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Timer")
 	void ForfeitActiveSegment();
 
+	UFUNCTION(BlueprintCallable, Category = "Timer")
+	void ApplyDeathPenalty();
+
 	UFUNCTION(BlueprintPure, Category = "Timer")
 	TArray<FTimerSegment> GetSegments() const { return Segments; }
 
@@ -70,6 +73,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Timer")
 	TArray<TSubclassOf<ARobotPart>> ItemOrder;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Timer")
+	float DeathPenaltySeconds = 15.f;
 
 private:
 	int32 FindActiveSegmentIndex() const;

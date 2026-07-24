@@ -106,6 +106,23 @@ void UPlayerTimerComponent::ForfeitActiveSegment()
 	OnSegmentDepleted.Broadcast(ActiveIndex);
 }
 
+void UPlayerTimerComponent::ApplyDeathPenalty()
+{
+	const int32 ActiveIndex = FindActiveSegmentIndex();
+	if (ActiveIndex == INDEX_NONE || Segments[ActiveIndex].ItemClass != nullptr)
+	{
+		return;
+	}
+
+	FTimerSegment& CoreSegment = Segments[ActiveIndex];
+	CoreSegment.RemainingTime = FMath::Max(CoreSegment.RemainingTime - DeathPenaltySeconds, 0.f);
+
+	if (CoreSegment.RemainingTime <= 0.f)
+	{
+		OnSegmentDepleted.Broadcast(ActiveIndex);
+	}
+}
+
 float UPlayerTimerComponent::GetTotalRemainingTime() const
 {
 	float Total = 0.f;

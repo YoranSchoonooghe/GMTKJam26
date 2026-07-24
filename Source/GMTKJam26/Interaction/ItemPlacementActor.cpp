@@ -206,6 +206,8 @@ void AItemPlacementActor::RetrievePlayerItem()
 
 void AItemPlacementActor::TryAttach()
 {
+	if (_bHasItem) return;
+
 	PreviewMesh->SetHiddenInGame(true);
 	InteractWidget->SetHiddenInGame(true);
 
@@ -243,9 +245,28 @@ void AItemPlacementActor::TryAttach()
 
 void AItemPlacementActor::ClearTargetItem()
 {
+	if (_bHasItem) return;
+
 	PreviewMesh->SetHiddenInGame(true);
 	InteractWidget->SetHiddenInGame(true);
 
+	_targetItem = nullptr;
+}
+
+void AItemPlacementActor::ExplodeAttachedItem()
+{
+	if (!_bHasItem || !_targetItem)
+	{
+		return;
+	}
+
+	const FVector RandomHorizontal = FMath::VRand().GetSafeNormal2D();
+	const float UpwardBias = FMath::FRandRange(0.4f, 0.9f);
+	const FVector ExplodeDirection = (RandomHorizontal * (1.f - UpwardBias) + FVector::UpVector * UpwardBias).GetSafeNormal();
+
+	_targetItem->Explode(ExplodeDirection, ExplodeImpulseStrength);
+
+	_bHasItem = false;
 	_targetItem = nullptr;
 }
 

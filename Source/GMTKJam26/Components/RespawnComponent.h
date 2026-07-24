@@ -7,6 +7,7 @@
 
 class ACharacter;
 class URespawnCountdownWidget;
+class UPlayerTimerComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDiedSignature, FVector, DeathLocation);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerRespawnedSignature);

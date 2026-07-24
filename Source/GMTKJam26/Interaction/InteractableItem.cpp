@@ -95,6 +95,18 @@ void AInteractableItem::SnapToAttachPoint(const FVector& Location, const FRotato
 	//OnAttached.Broadcast(Location);
 }
 
+void AInteractableItem::Explode(const FVector& ImpulseDirection, float ImpulseStrength)
+{
+	_bIsAttaching = false;
+
+	State = EInteractableItemState::Flying;
+	bCanBePickedUp = false;
+
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	Mesh->SetSimulatePhysics(true);
+	Mesh->AddImpulse(ImpulseDirection.GetSafeNormal() * ImpulseStrength, NAME_None, true);
+}
+
 void AInteractableItem::SetHighlight(bool highlighted)
 {
 	if (highlighted)

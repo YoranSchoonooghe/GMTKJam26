@@ -9,6 +9,7 @@
 #include "Menu/MenuFlowSubsystem.h"
 #include "Menu/States/MenuStateBase.h"
 #include "Character/PlayerControllerBase.h"
+#include "Interaction/ItemPlacementActor.h"
 
 void AGameModeGMTK::BeginPlay()
 {
@@ -141,7 +142,26 @@ void AGameModeGMTK::HandleGameOver(int32 LosingPlayerIndex)
 
 	OnGameOverSequenceStarted.Broadcast(LosingPawn, LosingPlayerIndex);
 
+	ExplodeRobotParts(LosingPlayerIndex);
+
 	GetWorldTimerManager().SetTimer(GameOverDelayTimerHandle, this, &AGameModeGMTK::ShowGameOverMenu, GameOverDelaySeconds, false);
+}
+
+void AGameModeGMTK::ExplodeRobotParts(int32 LosingPlayerIndex)
+{
+	TArray<AActor*> PlacementActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AItemPlacementActor::StaticClass(), PlacementActors);
+
+	for (AActor* Actor : PlacementActors)
+	{
+		if (AItemPlacementActor* PlacementActor = Cast<AItemPlacementActor>(Actor))
+		{
+			if (PlacementActor->GetPlayerIndex() == LosingPlayerIndex)
+			{
+				PlacementActor->ExplodeAttachedItem();
+			}
+		}
+	}
 }
 
 void AGameModeGMTK::ShowGameOverMenu()

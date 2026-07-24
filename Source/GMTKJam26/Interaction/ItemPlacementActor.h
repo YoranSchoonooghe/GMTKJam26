@@ -24,6 +24,12 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Placement")
 	FOnItemPlacedSignature OnItemPlaced;
 
+	UFUNCTION(BlueprintPure, Category = "Target Player")
+	int32 GetPlayerIndex() const { return PlayerIndex; }
+
+	UFUNCTION(BlueprintCallable, Category = "Robot Part")
+	void ExplodeAttachedItem();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -51,6 +57,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target Player")
 	int32 PlayerIndex{ 0 };
+
+	UPROPERTY(EditAnywhere, Category = "Robot Part")
+	float ExplodeImpulseStrength = 800.f;
 
 	UFUNCTION()
 	void OnBeginOverlap(

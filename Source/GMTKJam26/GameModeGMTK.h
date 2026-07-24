@@ -49,6 +49,7 @@ private:
 
 	void HandleGameOver(int32 LosingPlayerIndex);
 	void ShowGameOverMenu();
+	void ExplodeRobotParts(int32 LosingPlayerIndex);
 
 	int32 NextPlayerStartIndex = 0;
 	int32 PendingWinningPlayerIndex = -1;

@@ -43,6 +43,9 @@ public:
 
 	void SnapToAttachPoint(const FVector& Location, const FRotator& Rotation);
 
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	void Explode(const FVector& ImpulseDirection, float ImpulseStrength);
+
 	UFUNCTION(BlueprintPure, Category = "Interaction")
 	EInteractableItemState GetItemState() const { return State; }
 
