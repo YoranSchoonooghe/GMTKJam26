@@ -49,6 +49,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Falling Stair")
 	float ResetDuration{ 1.0f };
 
+	UPROPERTY(EditAnywhere, Category = "Falling Stair")
+	float Delay{ 0.0f };
+
+	UPROPERTY(EditAnywhere, Category = "Falling Stair")
+	float MinTimeBeforeReset{ 1.0f };
+
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -59,6 +66,7 @@ private:
 	void UpdateIdleState(float DeltaTime);
 	void UpdateShakingState(float DeltaTime);
 	void UpdateFallingState(float DeltaTime);
+	void UpdateCooldownState(float DeltaTime);
 	void UpdateResettingState(float DeltaTime);
 
 	EStairState _state{ EStairState::Idle };
@@ -68,4 +76,7 @@ private:
 	float _elapsedTimeInState{ 0.0f };
 
 	float _phaseOffset;
+
+	bool _bFinishedDelay{ false };
+	bool _bIsResetTriggered{ false };
 };
