@@ -30,6 +30,7 @@ void APlayerControllerBase::BeginPlay()
 
 	if (AActor* StaticCamera = UGameplayStatics::GetActorOfClass(GetWorld(), ATopDownCameraActor::StaticClass()))
 	{
+		bAutoManageActiveCameraTarget = false;
 		SetViewTarget(StaticCamera);
 	}
 

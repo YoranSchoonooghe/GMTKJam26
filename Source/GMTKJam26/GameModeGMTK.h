@@ -7,7 +7,7 @@
 
 class UMenuStateBase;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameOverSequenceStartedSignature, APawn*, LosingPawn);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGameOverSequenceStartedSignature, APawn*, LosingPawn, int32, LosingPlayerIndex);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameOverSequenceEndedSignature, int32, WinningPlayerIndex);
 

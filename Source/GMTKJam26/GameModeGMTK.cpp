@@ -130,15 +130,16 @@ void AGameModeGMTK::HandleGameOver(int32 LosingPlayerIndex)
 	bGameOverTriggered = true;
 	PendingWinningPlayerIndex = (LosingPlayerIndex == 0) ? 1 : 0;
 
-	if (APawn* LosingPawn = UGameplayStatics::GetPlayerPawn(this, LosingPlayerIndex))
+	APawn* LosingPawn = UGameplayStatics::GetPlayerPawn(this, LosingPlayerIndex);
+	if (LosingPawn)
 	{
 		if (AController* LosingController = LosingPawn->GetController())
 		{
 			LosingController->UnPossess();
 		}
-
-		OnGameOverSequenceStarted.Broadcast(LosingPawn);
 	}
+
+	OnGameOverSequenceStarted.Broadcast(LosingPawn, LosingPlayerIndex);
 
 	GetWorldTimerManager().SetTimer(GameOverDelayTimerHandle, this, &AGameModeGMTK::ShowGameOverMenu, GameOverDelaySeconds, false);
 }
