@@ -121,7 +121,7 @@ void AInteractableItem::OnMeshHit(UPrimitiveComponent* HitComponent, AActor* Oth
 			{
 				if (UPushComponent* HitPush = HitCharacter->FindComponentByClass<UPushComponent>())
 				{
-					HitPush->ApplyKnockback(GetActorLocation(), ThrownHitPushForce, ThrownHitPushUpwardForce);
+					HitPush->ApplyKnockback(Hit.ImpactPoint, ThrownHitPushForce, ThrownHitPushUpwardForce);
 				}
 
 				OnHitCharacter.Broadcast(HitCharacter);

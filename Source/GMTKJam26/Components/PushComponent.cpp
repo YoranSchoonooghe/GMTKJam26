@@ -145,7 +145,9 @@ void UPushComponent::ApplyKnockback(const FVector& SourceLocation, float Force, 
 	}
 
 	OwningCharacter->LaunchCharacter(Direction * Force + FVector::UpVector * UpwardForce, true, true);
-	OnKnockback.Broadcast(SourceLocation);
+
+	const FVector HitSideLocation = OwningCharacter->GetActorLocation() - Direction * KnockbackSourceOffset;
+	OnKnockback.Broadcast(HitSideLocation);
 }
 
 bool UPushComponent::TryShoveNearbyPlayer()

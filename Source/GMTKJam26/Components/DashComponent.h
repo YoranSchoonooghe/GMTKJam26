@@ -60,7 +60,7 @@ protected:
 private:
 	void StopDash();
 	void ResetDash();
-	void PushCharacter(ACharacter* OtherCharacter);
+	void PushCharacter(ACharacter* OtherCharacter, const FVector& SourceLocation);
 
 	UFUNCTION()
 	void OnCharacterHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);

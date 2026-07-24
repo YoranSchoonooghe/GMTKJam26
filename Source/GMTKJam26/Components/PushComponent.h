@@ -56,6 +56,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Push|Passive")
 	float PassivePushSpeedFactor = 0.5f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Push")
+	float KnockbackSourceOffset = 20.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Push|Debug")
 	bool bDrawDebugZone = false;
 

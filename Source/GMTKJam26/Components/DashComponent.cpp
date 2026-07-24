@@ -41,7 +41,7 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 			{
 				if (NearbyCharacter->FindComponentByClass<UPushComponent>())
 				{
-					PushCharacter(NearbyCharacter);
+					PushCharacter(NearbyCharacter, OwningCharacter->GetActorLocation());
 					break;
 				}
 			}
@@ -107,10 +107,10 @@ void UDashComponent::OnCharacterHit(AActor* SelfActor, AActor* OtherActor, FVect
 		return;
 	}
 
-	PushCharacter(OtherCharacter);
+	PushCharacter(OtherCharacter, Hit.ImpactPoint);
 }
 
-void UDashComponent::PushCharacter(ACharacter* OtherCharacter)
+void UDashComponent::PushCharacter(ACharacter* OtherCharacter, const FVector& SourceLocation)
 {
 	if (!OtherCharacter || !OwningCharacter.IsValid())
 	{
@@ -124,6 +124,6 @@ void UDashComponent::PushCharacter(ACharacter* OtherCharacter)
 	}
 
 	bHasPushedThisDash = true;
-	OtherPush->ApplyKnockback(OwningCharacter->GetActorLocation(), PushForce, PushUpwardForce);
+	OtherPush->ApplyKnockback(SourceLocation, PushForce, PushUpwardForce);
 	OnDashHitCharacter.Broadcast(OtherCharacter);
 }
