@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "TimerManager.h"
 #include "PlayerCharacter.generated.h"
 
 class UDashComponent;
@@ -84,6 +85,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> PunchMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
+	float InteractCooldown = 0.5f;
+
 	UFUNCTION()
 	void UpdateWalkSpeed();
 
@@ -95,4 +99,6 @@ protected:
 
 	UFUNCTION()
 	void PlayPushHitMontage(FVector SourceLocation);
+
+	FTimerHandle InteractCooldownTimerHandle;
 };

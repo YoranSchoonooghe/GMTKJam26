@@ -128,6 +128,13 @@ void APlayerCharacter::RequestInteract()
 		return;
 	}
 
+	if (GetWorldTimerManager().IsTimerActive(InteractCooldownTimerHandle))
+	{
+		return;
+	}
+
+	GetWorldTimerManager().SetTimer(InteractCooldownTimerHandle, InteractCooldown, false);
+
 	if (PickupComponent->IsHoldingItem())
 	{
 		if (ThrowComponent)
