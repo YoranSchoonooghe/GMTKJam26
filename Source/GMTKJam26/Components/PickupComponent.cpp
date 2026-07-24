@@ -28,11 +28,11 @@ void UPickupComponent::BeginPlay()
 	}
 }
 
-void UPickupComponent::TryPickup()
+bool UPickupComponent::TryPickup()
 {
-	if (HeldItem || !InteractionZone)
+	if (HeldItem || !InteractionZone || GetWorld()->GetTimerManager().IsTimerActive(PickupCooldownTimerHandle))
 	{
-		return;
+		return false;
 	}
 
 	TArray<AActor*> OverlappingActors;
@@ -66,7 +66,13 @@ void UPickupComponent::TryPickup()
 		{
 			HighlightedItem->SetHighlight(false);
 		}
+
+		GetWorld()->GetTimerManager().SetTimer(PickupCooldownTimerHandle, PickupCooldown, false);
+
+		return true;
 	}
+
+	return false;
 }
 
 void UPickupComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

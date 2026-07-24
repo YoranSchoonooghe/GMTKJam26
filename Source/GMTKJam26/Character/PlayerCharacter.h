@@ -11,6 +11,7 @@ class UPlayerTimerComponent;
 class UPushComponent;
 class URespawnComponent;
 class UDropComponent;
+class UAnimMontage;
 
 UCLASS()
 class GMTKJAM26_API APlayerCharacter : public ACharacter
@@ -25,6 +26,8 @@ public:
 
 	void RequestInteract();
 	void RequestDrop();
+
+	void ExecutePickupGrab();
 
 	UFUNCTION(BlueprintPure, Category = "Timer")
 	UPlayerTimerComponent* GetTimerComponent() const { return TimerComponent; }
@@ -69,9 +72,27 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Drop", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDropComponent> DropComponent;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> PickupMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> ThrowMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> PushHitMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> PunchMontage;
+
 	UFUNCTION()
 	void UpdateWalkSpeed();
 
 	UFUNCTION()
 	void HandlePlayerDied(FVector DeathLocation);
+
+	UFUNCTION()
+	void PlayThrowMontage();
+
+	UFUNCTION()
+	void PlayPushHitMontage(FVector SourceLocation);
 };

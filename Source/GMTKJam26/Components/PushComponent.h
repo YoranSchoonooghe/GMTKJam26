@@ -27,6 +27,9 @@ public:
 	bool TryShoveNearbyPlayer();
 
 	UFUNCTION(BlueprintCallable, Category = "Push")
+	void StartPunch();
+
+	UFUNCTION(BlueprintCallable, Category = "Push")
 	TArray<ACharacter*> GetOverlappingCharacters() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Push")
@@ -42,10 +45,16 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Push")
-	float ZoneRadiusPadding = 30.f;
+	float ZoneRadiusPadding = 45.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Push")
-	float ZoneHalfHeightPadding = 20.f;
+	float ZoneHalfHeightPadding = 30.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Push")
+	float PunchZoneHalfHeightPadding = 260.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Push")
+	float PunchActiveDuration = 0.5f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Push")
 	float ShoveForce = 700.f;
@@ -65,9 +74,13 @@ protected:
 private:
 	void ApplyPassivePush(float DeltaTime);
 	void RebuildZoneSize();
+	void EndPunchWindow();
 
 	UPROPERTY()
 	TObjectPtr<UCapsuleComponent> PushZone;
 
 	TWeakObjectPtr<ACharacter> OwningCharacter;
+
+	bool bPunchWindowActive = false;
+	FTimerHandle PunchWindowTimerHandle;
 };

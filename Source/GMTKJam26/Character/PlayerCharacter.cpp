@@ -7,6 +7,7 @@
 #include "Components/PushComponent.h"
 #include "Components/RespawnComponent.h"
 #include "Components/DropComponent.h"
+#include "Animation/AnimMontage.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -21,6 +22,8 @@ APlayerCharacter::APlayerCharacter()
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+
+	GetCharacterMovement()->bEnablePhysicsInteraction = true;
 
 	DashComponent = CreateDefaultSubobject<UDashComponent>(TEXT("DashComponent"));
 	PickupComponent = CreateDefaultSubobject<UPickupComponent>(TEXT("PickupComponent"));
@@ -41,6 +44,13 @@ void APlayerCharacter::BeginPlay()
 	DropComponent->OnItemLost.AddDynamic(this, &APlayerCharacter::UpdateWalkSpeed);
 
 	RespawnComponent->OnPlayerDied.AddDynamic(this, &APlayerCharacter::HandlePlayerDied);
+
+	ThrowComponent->OnItemThrown.AddDynamic(this, &APlayerCharacter::PlayThrowMontage);
+
+	if (PushComponent)
+	{
+		PushComponent->OnKnockback.AddDynamic(this, &APlayerCharacter::PlayPushHitMontage);
+	}
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -65,6 +75,30 @@ void APlayerCharacter::HandlePlayerDied(FVector DeathLocation)
 	if (TimerComponent)
 	{
 		TimerComponent->ForfeitActiveSegment();
+	}
+}
+
+void APlayerCharacter::ExecutePickupGrab()
+{
+	if (PickupComponent)
+	{
+		PickupComponent->TryPickup();
+	}
+}
+
+void APlayerCharacter::PlayThrowMontage()
+{
+	if (ThrowMontage)
+	{
+		PlayAnimMontage(ThrowMontage);
+	}
+}
+
+void APlayerCharacter::PlayPushHitMontage(FVector SourceLocation)
+{
+	if (PushHitMontage)
+	{
+		PlayAnimMontage(PushHitMontage);
 	}
 }
 
@@ -103,12 +137,28 @@ void APlayerCharacter::RequestInteract()
 		return;
 	}
 
-	if (PushComponent && PushComponent->TryShoveNearbyPlayer())
+	if (PickupComponent->HasNearbyItem())
 	{
+		if (PickupMontage)
+		{
+			PlayAnimMontage(PickupMontage);
+		}
+		else
+		{
+			PickupComponent->TryPickup();
+		}
 		return;
 	}
 
-	PickupComponent->TryPickup();
+	if (PunchMontage)
+	{
+		PlayAnimMontage(PunchMontage);
+	}
+
+	if (PushComponent)
+	{
+		PushComponent->StartPunch();
+	}
 }
 
 void APlayerCharacter::RequestDrop()

@@ -57,6 +57,12 @@ void UPushComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 	ApplyPassivePush(DeltaTime);
 
+	if (bPunchWindowActive && TryShoveNearbyPlayer())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(PunchWindowTimerHandle);
+		EndPunchWindow();
+	}
+
 	if (bDrawDebugZone && PushZone)
 	{
 		DrawDebugCapsule(GetWorld(), PushZone->GetComponentLocation(), PushZone->GetScaledCapsuleHalfHeight(),
@@ -148,6 +154,35 @@ void UPushComponent::ApplyKnockback(const FVector& SourceLocation, float Force, 
 
 	const FVector HitSideLocation = OwningCharacter->GetActorLocation() - Direction * KnockbackSourceOffset;
 	OnKnockback.Broadcast(HitSideLocation);
+}
+
+void UPushComponent::StartPunch()
+{
+	if (!PushZone || !OwningCharacter.IsValid())
+	{
+		return;
+	}
+
+	bPunchWindowActive = true;
+
+	const UCapsuleComponent* OwnerCapsule = OwningCharacter->GetCapsuleComponent();
+	const float Radius = (OwnerCapsule ? OwnerCapsule->GetScaledCapsuleRadius() : 34.f) + ZoneRadiusPadding;
+	const float HalfHeight = (OwnerCapsule ? OwnerCapsule->GetScaledCapsuleHalfHeight() : 88.f) + PunchZoneHalfHeightPadding;
+	PushZone->SetCapsuleSize(Radius, HalfHeight);
+
+	if (TryShoveNearbyPlayer())
+	{
+		EndPunchWindow();
+		return;
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(PunchWindowTimerHandle, this, &UPushComponent::EndPunchWindow, PunchActiveDuration, false);
+}
+
+void UPushComponent::EndPunchWindow()
+{
+	bPunchWindowActive = false;
+	RebuildZoneSize();
 }
 
 bool UPushComponent::TryShoveNearbyPlayer()

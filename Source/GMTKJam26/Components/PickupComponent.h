@@ -18,7 +18,7 @@ public:
 	UPickupComponent();
 
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
-	void TryPickup();
+	bool TryPickup();
 
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
 	void DropItem();
@@ -28,6 +28,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Pickup")
 	AInteractableItem* GetHeldItem() const { return HeldItem; }
+
+	UFUNCTION(BlueprintPure, Category = "Pickup")
+	bool HasNearbyItem() const { return HighlightedItem != nullptr; }
 
 	AInteractableItem* TakeHeldItem();
 
@@ -48,6 +51,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
 	FVector InteractionZoneOffset = FVector(100.f, 0.f, 0.f);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
+	float PickupCooldown = 0.5f;
 
 	UFUNCTION()
 	void OnBeginOverlap(
@@ -82,4 +88,6 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<AInteractableItem> HeldItem;
+
+	FTimerHandle PickupCooldownTimerHandle;
 };
