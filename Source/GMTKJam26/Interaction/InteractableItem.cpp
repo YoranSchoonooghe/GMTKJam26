@@ -2,6 +2,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Character.h"
 #include "Components/PushComponent.h"
+#include "Components/BlobShadowComponent.h"
 #include "GMTKJam26/Character/PlayerControllerBase.h"
 #include "GMTKJam26/Events/EventBusSubsystem.h"
 
@@ -15,6 +16,8 @@ AInteractableItem::AInteractableItem()
 	Mesh->SetSimulatePhysics(true);
 	Mesh->SetCollisionProfileName(FName("PhysicsActor"));
 	Mesh->SetNotifyRigidBodyCollision(true);
+
+	BlobShadowComponent = CreateDefaultSubobject<UBlobShadowComponent>(TEXT("BlobShadowComponent"));
 }
 
 void AInteractableItem::BeginPlay()

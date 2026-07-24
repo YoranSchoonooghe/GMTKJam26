@@ -5,6 +5,7 @@
 #include "InteractableItem.generated.h"
 
 class UStaticMeshComponent;
+class UBlobShadowComponent;
 
 UENUM(BlueprintType)
 enum class EInteractableItemState : uint8
@@ -72,6 +73,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> Mesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Blob Shadow", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UBlobShadowComponent> BlobShadowComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Interaction")
 	TObjectPtr<UMaterialInterface> OutlineMaterial;
