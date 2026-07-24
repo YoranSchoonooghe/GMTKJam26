@@ -96,6 +96,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Rumble")
 	TObjectPtr<UForceFeedbackEffect> PlacementRumbleEffect;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Rumble")
+	TObjectPtr<UForceFeedbackEffect> LandedRumbleEffect;
+
 private:
 	void Move(const FInputActionValue& Value);
 	void StartJump();
@@ -124,6 +127,9 @@ private:
 
 	UFUNCTION()
 	void HandleShoveRumble(class ACharacter* ShovedCharacter);
+
+	UFUNCTION()
+	void HandlePlayerLandedRumble(const FHitResult& Hit);
 
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> ControlledCharacter;

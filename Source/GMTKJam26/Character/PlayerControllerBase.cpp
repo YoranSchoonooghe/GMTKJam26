@@ -108,6 +108,11 @@ void APlayerControllerBase::NotifyItemBumped()
 	PlayRumbleEffect(ItemBumpRumbleEffect);
 }
 
+void APlayerControllerBase::HandlePlayerLandedRumble(const FHitResult& Hit)
+{
+	PlayRumbleEffect(LandedRumbleEffect);
+}
+
 void APlayerControllerBase::HandleKnockbackRumble(FVector SourceLocation)
 {
 	PlayRumbleEffect(KnockbackRumbleEffect);
@@ -191,6 +196,8 @@ void APlayerControllerBase::OnPossess(APawn* InPawn)
 		{
 			Respawn->OnPlayerDied.AddUniqueDynamic(this, &APlayerControllerBase::HandleOwnDeathRumble);
 		}
+
+		ControlledCharacter->LandedDelegate.AddUniqueDynamic(this, &APlayerControllerBase::HandlePlayerLandedRumble);
 	}
 
 	if (ControlledCharacter && TimerWidgetClass && IsLocalPlayerController())
