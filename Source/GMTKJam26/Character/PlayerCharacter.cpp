@@ -7,6 +7,8 @@
 #include "Components/PushComponent.h"
 #include "Components/RespawnComponent.h"
 #include "Components/DropComponent.h"
+#include "Components/StunComponent.h"
+#include "Components/BlobShadowComponent.h"
 #include "Animation/AnimMontage.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -32,6 +34,15 @@ APlayerCharacter::APlayerCharacter()
 	PushComponent = CreateDefaultSubobject<UPushComponent>(TEXT("PushComponent"));
 	RespawnComponent = CreateDefaultSubobject<URespawnComponent>(TEXT("RespawnComponent"));
 	DropComponent = CreateDefaultSubobject<UDropComponent>(TEXT("DropComponent"));
+	StunComponent = CreateDefaultSubobject<UStunComponent>(TEXT("StunComponent"));
+	BlobShadowComponent = CreateDefaultSubobject<UBlobShadowComponent>(TEXT("BlobShadowComponent"));
+}
+
+void APlayerCharacter::Jump()
+{
+	if (StunComponent && StunComponent->IsStunned()) return;
+
+	Super::Jump();
 }
 
 void APlayerCharacter::BeginPlay()
@@ -50,6 +61,7 @@ void APlayerCharacter::BeginPlay()
 	if (PushComponent)
 	{
 		PushComponent->OnKnockback.AddDynamic(this, &APlayerCharacter::PlayPushHitMontage);
+		PushComponent->OnKnockback.AddDynamic(this, &APlayerCharacter::RequestStun);
 	}
 }
 
@@ -80,6 +92,8 @@ void APlayerCharacter::HandlePlayerDied(FVector DeathLocation)
 
 void APlayerCharacter::ExecutePickupGrab()
 {
+	if (StunComponent && StunComponent->IsStunned()) return;
+
 	if (PickupComponent)
 	{
 		PickupComponent->TryPickup();
@@ -102,6 +116,14 @@ void APlayerCharacter::PlayPushHitMontage(FVector SourceLocation)
 	}
 }
 
+void APlayerCharacter::RequestStun(FVector SourceLocation)
+{
+	if (StunComponent)
+	{
+		StunComponent->Stun();
+	}
+}
+
 void APlayerCharacter::Move(const FVector2D& MovementVector)
 {
 	if (DashComponent && DashComponent->IsDashing())
@@ -115,6 +137,8 @@ void APlayerCharacter::Move(const FVector2D& MovementVector)
 
 void APlayerCharacter::RequestDash()
 {
+	if (StunComponent && StunComponent->IsStunned()) return;
+
 	if (DashComponent)
 	{
 		DashComponent->StartDash();
@@ -123,6 +147,8 @@ void APlayerCharacter::RequestDash()
 
 void APlayerCharacter::RequestInteract()
 {
+	if (StunComponent && StunComponent->IsStunned()) return;
+
 	if (!PickupComponent)
 	{
 		return;

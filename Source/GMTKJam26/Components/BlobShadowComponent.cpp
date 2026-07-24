@@ -91,6 +91,7 @@ void UBlobShadowComponent::UpdateShadow()
 
 		const float scale = FMath::Lerp(1.0f, 0.4f, relativeDistance);
 		DecalComponent->DecalSize = DecalSize * scale;
+		DecalComponent->MarkRenderStateDirty();
 	}
 	else
 	{

@@ -13,6 +13,8 @@ class UPushComponent;
 class URespawnComponent;
 class UDropComponent;
 class UAnimMontage;
+class UStunComponent;
+class UBlobShadowComponent;
 
 UCLASS()
 class GMTKJAM26_API APlayerCharacter : public ACharacter
@@ -21,6 +23,8 @@ class GMTKJAM26_API APlayerCharacter : public ACharacter
 
 public:
 	APlayerCharacter();
+
+	virtual void Jump() override;
 
 	void Move(const FVector2D& MovementVector);
 	void RequestDash();
@@ -85,6 +89,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> PunchMontage;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stun", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStunComponent> StunComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Blob Shadow", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UBlobShadowComponent> BlobShadowComponent;
+
+
 	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
 	float InteractCooldown = 0.5f;
 
@@ -99,6 +110,9 @@ protected:
 
 	UFUNCTION()
 	void PlayPushHitMontage(FVector SourceLocation);
+
+	UFUNCTION()
+	void RequestStun(FVector SourceLocation);
 
 	FTimerHandle InteractCooldownTimerHandle;
 };
