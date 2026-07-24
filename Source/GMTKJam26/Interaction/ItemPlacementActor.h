@@ -19,6 +19,8 @@ class GMTKJAM26_API AItemPlacementActor : public AActor
 public:
 	AItemPlacementActor();
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 	UPROPERTY(BlueprintAssignable, Category = "Placement")
 	FOnItemPlacedSignature OnItemPlaced;
 
@@ -33,7 +35,19 @@ protected:
 	TObjectPtr<UWidgetComponent> InteractWidget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Robot Part")
+	TSubclassOf<ARobotPart> ExpectedItemClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Robot Part")
 	EPartType ExpectedPartType{ EPartType::Head };
+
+	UPROPERTY(EditAnywhere, Category = "Robot Part")
+	TObjectPtr<UMaterialInterface> GhostMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Robot Part")
+	FName GhostOpacityParameterName = "Opacity";
+
+	UPROPERTY(EditAnywhere, Category = "Robot Part", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float GhostOpacity = 0.35f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target Player")
 	int32 PlayerIndex{ 0 };
@@ -64,6 +78,8 @@ private:
 	void TryAttach();
 	UFUNCTION()
 	void ClearTargetItem();
+
+	void RefreshPreviewFromExpectedItem();
 
 	bool _bHasItem{ false };
 	bool _bPlayerIsInRange{ false };

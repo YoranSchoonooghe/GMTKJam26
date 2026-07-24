@@ -49,6 +49,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Interaction")
 	AActor* GetLastHolder() const { return LastHolder.Get(); }
 
+	UFUNCTION(BlueprintPure, Category = "Interaction")
+	UStaticMeshComponent* GetItemMesh() const { return Mesh; }
+
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
 	void SetHighlight(bool highlighted);
 

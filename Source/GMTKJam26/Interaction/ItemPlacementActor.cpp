@@ -7,10 +7,60 @@
 #include "GMTKJam26/Components/DropComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/WidgetComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "RobotPart.h"
 #include "Character/PlayerCharacter.h"
 #include "Character/PlayerControllerBase.h"
 #include "Components/PlayerTimerComponent.h"
+
+namespace
+{
+	void CopyMaterialParameters(UMaterialInterface* Source, UMaterialInstanceDynamic* Target)
+	{
+		if (!Source || !Target)
+		{
+			return;
+		}
+
+		TArray<FMaterialParameterInfo> ParameterInfos;
+		TArray<FGuid> ParameterIds;
+
+		Source->GetAllVectorParameterInfo(ParameterInfos, ParameterIds);
+		for (const FMaterialParameterInfo& Info : ParameterInfos)
+		{
+			FLinearColor Value;
+			if (Source->GetVectorParameterValue(Info, Value))
+			{
+				Target->SetVectorParameterValueByInfo(Info, Value);
+			}
+		}
+
+		ParameterInfos.Reset();
+		ParameterIds.Reset();
+		Source->GetAllScalarParameterInfo(ParameterInfos, ParameterIds);
+		for (const FMaterialParameterInfo& Info : ParameterInfos)
+		{
+			float Value = 0.f;
+			if (Source->GetScalarParameterValue(Info, Value))
+			{
+				Target->SetScalarParameterValueByInfo(Info, Value);
+			}
+		}
+
+		ParameterInfos.Reset();
+		ParameterIds.Reset();
+		Source->GetAllTextureParameterInfo(ParameterInfos, ParameterIds);
+		for (const FMaterialParameterInfo& Info : ParameterInfos)
+		{
+			UTexture* Value = nullptr;
+			if (Source->GetTextureParameterValue(Info, Value))
+			{
+				Target->SetTextureParameterValueByInfo(Info, Value);
+			}
+		}
+	}
+}
 
 AItemPlacementActor::AItemPlacementActor()
 {
@@ -35,10 +85,55 @@ AItemPlacementActor::AItemPlacementActor()
 	TriggerBox->OnComponentEndOverlap.AddDynamic(this, &AItemPlacementActor::OnEndOverlap);
 }
 
+void AItemPlacementActor::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	RefreshPreviewFromExpectedItem();
+}
+
+void AItemPlacementActor::RefreshPreviewFromExpectedItem()
+{
+	if (!PreviewMesh || !ExpectedItemClass)
+	{
+		return;
+	}
+
+	const ARobotPart* DefaultItem = GetDefault<ARobotPart>(ExpectedItemClass);
+	if (!DefaultItem)
+	{
+		return;
+	}
+
+	ExpectedPartType = DefaultItem->GetPartType();
+
+	UStaticMeshComponent* DefaultMesh = DefaultItem->GetItemMesh();
+	if (!DefaultMesh)
+	{
+		return;
+	}
+
+	PreviewMesh->SetStaticMesh(DefaultMesh->GetStaticMesh());
+	PreviewMesh->SetRelativeTransform(DefaultMesh->GetRelativeTransform());
+
+	if (GhostMaterial)
+	{
+		const int32 NumMaterials = DefaultMesh->GetNumMaterials();
+		for (int32 Index = 0; Index < NumMaterials; ++Index)
+		{
+			UMaterialInstanceDynamic* GhostInstance = UMaterialInstanceDynamic::Create(GhostMaterial, this);
+			CopyMaterialParameters(DefaultMesh->GetMaterial(Index), GhostInstance);
+			GhostInstance->SetScalarParameterValue(GhostOpacityParameterName, GhostOpacity);
+
+			PreviewMesh->SetMaterial(Index, GhostInstance);
+		}
+	}
+}
+
 void AItemPlacementActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	PreviewMesh->SetHiddenInGame(true);
 
 	_targetPlayer = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, PlayerIndex));
