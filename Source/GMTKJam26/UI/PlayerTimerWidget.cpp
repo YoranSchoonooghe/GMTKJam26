@@ -1,11 +1,19 @@
 #include "PlayerTimerWidget.h"
 #include "TimerSegmentWidget.h"
-#include "Components/PanelWidget.h"
+#include "Components/CanvasPanel.h"
+#include "Components/CanvasPanelSlot.h"
 #include "Components/PlayerTimerComponent.h"
+#include "Engine/Texture2D.h"
 
 void UPlayerTimerWidget::InitTimerComponent(UPlayerTimerComponent* InTimerComponent)
 {
 	TimerComponent = InTimerComponent;
+}
+
+void UPlayerTimerWidget::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+
 	BuildSegmentWidgets();
 }
 
@@ -13,15 +21,19 @@ void UPlayerTimerWidget::BuildSegmentWidgets()
 {
 	SegmentWidgets.Empty();
 
-	if (!SegmentContainer || !SegmentWidgetClass || !TimerComponent)
+	if (!SegmentContainer || !SegmentWidgetClass)
 	{
 		return;
 	}
 
 	SegmentContainer->ClearChildren();
 
-	const TArray<FTimerSegment> Segments = TimerComponent->GetSegments();
-	for (int32 Index = 0; Index < Segments.Num(); ++Index)
+	TArray<FTimerSegmentVisual> AllVisuals = ItemVisuals;
+	AllVisuals.Add(CoreVisual);
+
+	float NextX = 0.f;
+
+	for (const FTimerSegmentVisual& Visual : AllVisuals)
 	{
 		UTimerSegmentWidget* SegmentWidget = CreateWidget<UTimerSegmentWidget>(this, SegmentWidgetClass);
 		if (!SegmentWidget)
@@ -29,21 +41,29 @@ void UPlayerTimerWidget::BuildSegmentWidgets()
 			continue;
 		}
 
-		const bool bIsCoreSegment = (Index == Segments.Num() - 1);
+		SegmentWidget->SetVisual(Visual.DisplayName, Visual.FillIcon, Visual.BackgroundIcon, Visual.Offset);
 
-		FTimerSegmentVisual Visual;
-		if (bIsCoreSegment)
+		if (Visual.bMirrorIcon)
 		{
-			Visual = CoreVisual;
-		}
-		else if (ItemVisuals.IsValidIndex(Index))
-		{
-			Visual = ItemVisuals[Index];
+			SegmentWidget->SetRenderTransformPivot(FVector2D(0.5f, 0.5f));
+			SegmentWidget->SetRenderScale(FVector2D(-1.f, 1.f));
 		}
 
-		SegmentWidget->SetDisplayName(Visual.DisplayName);
-		SegmentWidget->SetIcons(Visual.FillIcon, Visual.BackgroundIcon);
-		SegmentContainer->AddChild(SegmentWidget);
+		const UTexture2D* SizingTexture = Visual.FillIcon ? Visual.FillIcon : Visual.BackgroundIcon;
+		const FVector2D NativeSize = SizingTexture ? FVector2D(SizingTexture->GetSizeX(), SizingTexture->GetSizeY()) : FVector2D(400.f, 300.f);
+		const FVector2D SegmentSize = NativeSize * GlobalScale;
+
+		if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(SegmentContainer->AddChild(SegmentWidget)))
+		{
+			CanvasSlot->SetAnchors(FAnchors(0.f, 0.f));
+			CanvasSlot->SetAlignment(FVector2D::ZeroVector);
+			CanvasSlot->SetAutoSize(false);
+			CanvasSlot->SetSize(SegmentSize);
+			CanvasSlot->SetPosition(FVector2D(NextX, 0.f));
+		}
+
+		NextX += SegmentSize.X - OverlapAmount;
+
 		SegmentWidgets.Add(SegmentWidget);
 	}
 }

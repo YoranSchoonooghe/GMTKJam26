@@ -3,38 +3,52 @@
 #include "Components/TextBlock.h"
 #include "Engine/Texture2D.h"
 
-void UTimerSegmentWidget::SetDisplayName(const FText& InDisplayName)
+void UTimerSegmentWidget::SetVisual(const FText& InDisplayName, UTexture2D* InFillIcon, UTexture2D* InBackgroundIcon, const FVector2D& InOffset)
 {
-	if (NameLabel)
-	{
-		NameLabel->SetText(InDisplayName);
-	}
+	DisplayName = InDisplayName;
+	FillIcon = InFillIcon;
+	BackgroundIcon = InBackgroundIcon;
+	Offset = InOffset;
+
+	ApplyVisual();
 }
 
-void UTimerSegmentWidget::SetIcons(UTexture2D* FillIcon, UTexture2D* BackgroundIcon)
+void UTimerSegmentWidget::NativePreConstruct()
 {
-	if (!TimeBar)
+	Super::NativePreConstruct();
+
+	ApplyVisual();
+}
+
+void UTimerSegmentWidget::ApplyVisual()
+{
+	SetRenderTranslation(Offset);
+
+	if (NameLabel)
 	{
-		return;
+		NameLabel->SetText(DisplayName);
 	}
 
-	FProgressBarStyle NewStyle = TimeBar->WidgetStyle;
-
-	if (FillIcon)
+	if (TimeBar)
 	{
-		NewStyle.FillImage.SetResourceObject(FillIcon);
-		NewStyle.FillImage.ImageSize = FVector2D(FillIcon->GetSizeX(), FillIcon->GetSizeY());
-		NewStyle.FillImage.TintColor = FSlateColor(FLinearColor::White);
-	}
+		FProgressBarStyle NewStyle = TimeBar->WidgetStyle;
 
-	if (BackgroundIcon)
-	{
-		NewStyle.BackgroundImage.SetResourceObject(BackgroundIcon);
-		NewStyle.BackgroundImage.ImageSize = FVector2D(BackgroundIcon->GetSizeX(), BackgroundIcon->GetSizeY());
-		NewStyle.BackgroundImage.TintColor = FSlateColor(FLinearColor::White);
-	}
+		if (FillIcon)
+		{
+			NewStyle.FillImage.SetResourceObject(FillIcon);
+			NewStyle.FillImage.ImageSize = FVector2D(FillIcon->GetSizeX(), FillIcon->GetSizeY());
+			NewStyle.FillImage.TintColor = FSlateColor(FLinearColor::White);
+		}
 
-	TimeBar->SetWidgetStyle(NewStyle);
+		if (BackgroundIcon)
+		{
+			NewStyle.BackgroundImage.SetResourceObject(BackgroundIcon);
+			NewStyle.BackgroundImage.ImageSize = FVector2D(BackgroundIcon->GetSizeX(), BackgroundIcon->GetSizeY());
+			NewStyle.BackgroundImage.TintColor = FSlateColor(FLinearColor::White);
+		}
+
+		TimeBar->SetWidgetStyle(NewStyle);
+	}
 }
 
 void UTimerSegmentWidget::UpdateSegment(const FTimerSegment& Segment, bool bIsActive)
