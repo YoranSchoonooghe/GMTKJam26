@@ -45,6 +45,11 @@ void APlayerControllerBase::BeginPlay()
 			}
 		}
 	}
+
+	if (IsLocalController())
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &APlayerControllerBase::CacheSecondPlayerController);
+	}
 }
 
 void APlayerControllerBase::SetupInputComponent()
@@ -77,6 +82,29 @@ void APlayerControllerBase::SetupInputComponent()
 		if (PauseAction)
 		{
 			EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &APlayerControllerBase::RequestPauseToggle);
+		}
+
+		if (IsLocalPlayerController() && GetLocalPlayer()->GetControllerId() == 0)
+		{
+			if (MoveP2Action)
+			{
+				EnhancedInputComponent->BindAction(MoveP2Action, ETriggerEvent::Triggered, this, &APlayerControllerBase::MoveP2);
+			}
+
+			if (JumpP2Action)
+			{
+				EnhancedInputComponent->BindAction(JumpP2Action, ETriggerEvent::Started, this, &APlayerControllerBase::StartJumpP2);
+			}
+
+			if (DashP2Action)
+			{
+				EnhancedInputComponent->BindAction(DashP2Action, ETriggerEvent::Triggered, this, &APlayerControllerBase::StartDashP2);
+			}
+
+			if (InteractP2Action)
+			{
+				EnhancedInputComponent->BindAction(InteractP2Action, ETriggerEvent::Started, this, &APlayerControllerBase::StartInteractP2);
+			}
 		}
 	}
 }
@@ -112,6 +140,14 @@ void APlayerControllerBase::NotifyItemBumped()
 void APlayerControllerBase::HandlePlayerLandedRumble(const FHitResult& Hit)
 {
 	PlayRumbleEffect(LandedRumbleEffect);
+}
+
+void APlayerControllerBase::CacheSecondPlayerController()
+{
+	if (GetLocalPlayer() && GetLocalPlayer()->GetLocalPlayerIndex() == 0)
+	{
+		SecondPlayerController = Cast<APlayerControllerBase>(UGameplayStatics::GetPlayerController(GetWorld(), 1));
+	}
 }
 
 void APlayerControllerBase::HandleKnockbackRumble(FVector SourceLocation)
@@ -306,5 +342,45 @@ void APlayerControllerBase::RequestPauseToggle()
 	if (UMenuFlowSubsystem* Flow = GetGameInstance() ? GetGameInstance()->GetSubsystem<UMenuFlowSubsystem>() : nullptr)
 	{
 		Flow->RequestBack();
+	}
+}
+
+void APlayerControllerBase::MoveP2(const FInputActionValue& Value)
+{
+	if (SecondPlayerController)
+	{
+		SecondPlayerController->Move(Value);
+	}
+}
+
+void APlayerControllerBase::StartJumpP2()
+{
+	if (SecondPlayerController)
+	{
+		SecondPlayerController->StartJump();
+	}
+}
+
+void APlayerControllerBase::StopJumpP2()
+{
+	if (SecondPlayerController)
+	{
+		SecondPlayerController->StopJump();
+	}
+}
+
+void APlayerControllerBase::StartDashP2()
+{
+	if (SecondPlayerController)
+	{
+		SecondPlayerController->StartDash();
+	}
+}
+
+void APlayerControllerBase::StartInteractP2()
+{
+	if (SecondPlayerController)
+	{
+		SecondPlayerController->StartInteract();
 	}
 }
