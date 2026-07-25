@@ -36,6 +36,7 @@ void AFallingStair::Tick(float DeltaTime)
 		UpdateFallingState(DeltaTime);
 		break;
 	case EStairState::Cooldown:
+		UpdateCooldownState(DeltaTime);
 		break;
 	case EStairState::Resetting:
 		UpdateResettingState(DeltaTime);
@@ -47,11 +48,7 @@ void AFallingStair::Reset()
 {
 	if (_state != EStairState::Cooldown && _state != EStairState::Falling) return;
 
-	_cooldownLocation = GetActorLocation();
-
-	SetActorHiddenInGame(false);
-	_state = EStairState::Resetting;
-	_elapsedTimeInState = 0.0f;
+	_bIsResetTriggered = true;
 }
 
 void AFallingStair::UpdateIdleState(float DeltaTime)
@@ -99,6 +96,14 @@ void AFallingStair::UpdateFallingState(float DeltaTime)
 {
 	_elapsedTimeInState += DeltaTime;
 
+	if (!_bFinishedDelay)
+	{
+		if (_elapsedTimeInState < Delay) return;
+
+		_bFinishedDelay = true;
+		_elapsedTimeInState -= Delay;
+	}
+
 	const float fallSpeed = GravityMultiplier * GetWorld()->GetGravityZ() * _elapsedTimeInState;
 
 	FVector location = GetActorLocation() + FVector(0.0f, 0.0f, fallSpeed * _elapsedTimeInState);
@@ -107,6 +112,7 @@ void AFallingStair::UpdateFallingState(float DeltaTime)
 	{
 		_elapsedTimeInState = 0.0f;
 		_state = EStairState::Cooldown;
+		_bFinishedDelay = false;
 
 		SetActorHiddenInGame(true);
 
@@ -122,9 +128,34 @@ void AFallingStair::UpdateFallingState(float DeltaTime)
 	SetActorLocation(location);
 }
 
+void AFallingStair::UpdateCooldownState(float DeltaTime)
+{
+	_elapsedTimeInState += DeltaTime;
+
+	if (_elapsedTimeInState >= MinTimeBeforeReset)
+	{
+		if (!_bIsResetTriggered) return;
+
+		_cooldownLocation = GetActorLocation();
+
+		SetActorHiddenInGame(false);
+		_state = EStairState::Resetting;
+		_elapsedTimeInState = 0.0f;
+		_bIsResetTriggered = false;
+	}
+}
+
 void AFallingStair::UpdateResettingState(float DeltaTime)
 {
 	_elapsedTimeInState += DeltaTime;
+
+	if (!_bFinishedDelay)
+	{
+		if (_elapsedTimeInState < Delay) return;
+
+		_bFinishedDelay = true;
+		_elapsedTimeInState -= Delay;
+	}
 
 	float alpha = FMath::Clamp(_elapsedTimeInState / ResetDuration, 0.0f, 1.0f);
 
@@ -136,6 +167,7 @@ void AFallingStair::UpdateResettingState(float DeltaTime)
 	{
 		_elapsedTimeInState = 0.0f;
 		_state = EStairState::Idle;
+		_bFinishedDelay = false;
 		
 		SetActorLocation(_startLocation);
 	}
