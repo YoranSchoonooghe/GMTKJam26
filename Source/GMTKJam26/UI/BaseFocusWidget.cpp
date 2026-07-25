@@ -60,7 +60,10 @@ void UBaseFocusWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 		return;
 	}
 
-	const TSharedPtr<SWidget> FocusedSlate = FSlateApplication::Get().GetUserFocusedWidget(0);
+	APlayerController* PC = GetOwningPlayer();
+	const int32 SlateUserIndex = (PC && PC->GetLocalPlayer()) ? PC->GetLocalPlayer()->GetControllerId() : 0;
+
+	const TSharedPtr<SWidget> FocusedSlate = FSlateApplication::Get().GetUserFocusedWidget(SlateUserIndex);
 
 	UButton* FocusedButton = nullptr;
 	if (FocusedSlate.IsValid())
@@ -93,6 +96,6 @@ void UBaseFocusWidget::FocusButton(UButton* Button) const
 {
 	if (Button)
 	{
-		Button->SetKeyboardFocus();
+		Button->SetUserFocus(GetOwningPlayer());
 	}
 }
