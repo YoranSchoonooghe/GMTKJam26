@@ -24,6 +24,8 @@ protected:
 	TObjectPtr<UTextBlock> CountdownLabel;
 
 private:
+	void UpdateScreenPosition();
+
 	FVector WorldLocation = FVector::ZeroVector;
 	float Duration = 5.f;
 	float Elapsed = 0.f;
