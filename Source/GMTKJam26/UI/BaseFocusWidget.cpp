@@ -3,6 +3,7 @@
 #include "Components/Button.h"
 #include "Framework/Application/SlateApplication.h"
 #include "GameFramework/PlayerController.h"
+#include "ParallaxBackgroundWidget.h"
 
 void UBaseFocusWidget::NativeConstruct()
 {
@@ -90,6 +91,47 @@ void UBaseFocusWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 	}
 
 	FocusButton(LastFocusedButton.IsValid() ? LastFocusedButton.Get() : FirstFocusedElement.Get());
+}
+
+FReply UBaseFocusWidget::NativeOnAnalogValueChanged(const FGeometry& InGeometry, const FAnalogInputEvent& InAnalogEvent)
+{
+	const FReply Reply = Super::NativeOnAnalogValueChanged(InGeometry, InAnalogEvent);
+
+	const FKey Key = InAnalogEvent.GetKey();
+
+	if (Key == EKeys::Gamepad_RightX)
+	{
+		CachedStickInput.X = InAnalogEvent.GetAnalogValue();
+	}
+	else if (Key == EKeys::Gamepad_RightY)
+	{
+		CachedStickInput.Y = InAnalogEvent.GetAnalogValue();
+	}
+	else
+	{
+		return Reply;
+	}
+
+	if (!CachedParallaxWidget.IsValid() && WidgetTree)
+	{
+		WidgetTree->ForEachWidget([this](UWidget* Widget)
+		{
+			if (!CachedParallaxWidget.IsValid())
+			{
+				if (UParallaxBackgroundWidget* Parallax = Cast<UParallaxBackgroundWidget>(Widget))
+				{
+					CachedParallaxWidget = Parallax;
+				}
+			}
+		});
+	}
+
+	if (UParallaxBackgroundWidget* Parallax = CachedParallaxWidget.Get())
+	{
+		Parallax->SetGamepadStickInput(CachedStickInput);
+	}
+
+	return Reply;
 }
 
 void UBaseFocusWidget::FocusButton(UButton* Button) const

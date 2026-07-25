@@ -31,6 +31,8 @@ class GMTKJAM26_API UParallaxBackgroundWidget : public UUserWidget
 public:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
+	void SetGamepadStickInput(const FVector2D& StickValue);
+
 protected:
 	virtual void NativePreConstruct() override;
 	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
@@ -47,12 +49,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Parallax")
 	float InterpSpeed = 6.f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Parallax", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float StickDeadzone = 0.15f;
+
 private:
 	void BuildLayers();
 
 	UPROPERTY()
 	TArray<TObjectPtr<UImage>> LayerImages;
 
-	FVector2D TargetOffset = FVector2D::ZeroVector;
+	FVector2D MouseTargetOffset = FVector2D::ZeroVector;
+	FVector2D StickTargetOffset = FVector2D::ZeroVector;
+	bool bStickActive = false;
+
 	FVector2D CurrentOffset = FVector2D::ZeroVector;
 };

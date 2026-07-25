@@ -5,6 +5,7 @@
 #include "BaseFocusWidget.generated.h"
 
 class UButton;
+class UParallaxBackgroundWidget;
 
 UCLASS(Abstract)
 class GMTKJAM26_API UBaseFocusWidget : public UUserWidget
@@ -16,6 +17,8 @@ protected:
 	virtual void NativeDestruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
+	virtual FReply NativeOnAnalogValueChanged(const FGeometry& InGeometry, const FAnalogInputEvent& InAnalogEvent) override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Focus", meta = (BindWidgetOptional))
 	TObjectPtr<UButton> FirstFocusedElement;
 
@@ -23,4 +26,6 @@ private:
 	void FocusButton(UButton* Button) const;
 
 	TWeakObjectPtr<UButton> LastFocusedButton;
+	TWeakObjectPtr<UParallaxBackgroundWidget> CachedParallaxWidget;
+	FVector2D CachedStickInput = FVector2D::ZeroVector;
 };
