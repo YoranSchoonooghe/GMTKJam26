@@ -211,6 +211,11 @@ void ASplineConveyorBelt::Tick(float DeltaTime)
 				continue;
 			}
 
+			if (ActorLocation.Z < ClosestPoint.Z - MinRideHeightTolerance)
+			{
+				continue;
+			}
+
 			CurrentDistance = ConveyorSpline->GetDistanceAlongSplineAtSplineInputKey(InputKey);
 		}
 

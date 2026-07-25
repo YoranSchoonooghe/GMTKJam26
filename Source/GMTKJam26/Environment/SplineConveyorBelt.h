@@ -64,6 +64,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conveyor")
 	float MaxRideDistance = 100.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conveyor")
+	float MinRideHeightTolerance = 10.f;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Conveyor|Spawning", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USceneComponent> SpawnPoint;
 
