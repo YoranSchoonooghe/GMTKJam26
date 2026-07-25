@@ -17,6 +17,11 @@ void AGameModeGMTK::BeginPlay()
 
 	if (UGameInstance* GameInstance = GetGameInstance())
 	{
+		if (UMenuFlowSubsystem* MenuFlow = GameInstance->GetSubsystem<UMenuFlowSubsystem>())
+		{
+			NumberOfLocalPlayers = MenuFlow->GetDesiredPlayerCount();
+		}
+
 		while (GameInstance->GetNumLocalPlayers() < NumberOfLocalPlayers)
 		{
 			FString Error;
@@ -39,36 +44,34 @@ void AGameModeGMTK::BeginPlay()
 
 void AGameModeGMTK::BindPlayerTimerEvents()
 {
-	APawn* Player1Pawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	APawn* Player2Pawn = UGameplayStatics::GetPlayerPawn(this, 1);
+	bool bAllBound = true;
 
-	bool bBothBound = true;
-
-	if (Player1Pawn)
+	for (int32 PlayerIndex = 0; PlayerIndex < NumberOfLocalPlayers; ++PlayerIndex)
 	{
-		if (UPlayerTimerComponent* Timer = Player1Pawn->FindComponentByClass<UPlayerTimerComponent>())
+		APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, PlayerIndex);
+		if (!PlayerPawn)
 		{
-			Timer->OnTimerExpired.AddUniqueDynamic(this, &AGameModeGMTK::HandlePlayer1TimerExpired);
+			bAllBound = false;
+			continue;
+		}
+
+		UPlayerTimerComponent* Timer = PlayerPawn->FindComponentByClass<UPlayerTimerComponent>();
+		if (!Timer)
+		{
+			continue;
+		}
+
+		switch (PlayerIndex)
+		{
+		case 0: Timer->OnTimerExpired.AddUniqueDynamic(this, &AGameModeGMTK::HandlePlayer1TimerExpired); break;
+		case 1: Timer->OnTimerExpired.AddUniqueDynamic(this, &AGameModeGMTK::HandlePlayer2TimerExpired); break;
+		case 2: Timer->OnTimerExpired.AddUniqueDynamic(this, &AGameModeGMTK::HandlePlayer3TimerExpired); break;
+		case 3: Timer->OnTimerExpired.AddUniqueDynamic(this, &AGameModeGMTK::HandlePlayer4TimerExpired); break;
+		default: break;
 		}
 	}
-	else
-	{
-		bBothBound = false;
-	}
 
-	if (Player2Pawn)
-	{
-		if (UPlayerTimerComponent* Timer = Player2Pawn->FindComponentByClass<UPlayerTimerComponent>())
-		{
-			Timer->OnTimerExpired.AddUniqueDynamic(this, &AGameModeGMTK::HandlePlayer2TimerExpired);
-		}
-	}
-	else
-	{
-		bBothBound = false;
-	}
-
-	if (!bBothBound)
+	if (!bAllBound)
 	{
 		GetWorldTimerManager().SetTimer(BindTimerEventsRetryHandle, this, &AGameModeGMTK::BindPlayerTimerEvents, 0.2f, false);
 	}
@@ -76,36 +79,39 @@ void AGameModeGMTK::BindPlayerTimerEvents()
 
 void AGameModeGMTK::BindPlayerRespawnEvents()
 {
-	APawn* Player1Pawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	APawn* Player2Pawn = UGameplayStatics::GetPlayerPawn(this, 1);
+	bool bAllBound = true;
 
-	URespawnComponent* Respawn1 = Player1Pawn ? Player1Pawn->FindComponentByClass<URespawnComponent>() : nullptr;
-	URespawnComponent* Respawn2 = Player2Pawn ? Player2Pawn->FindComponentByClass<URespawnComponent>() : nullptr;
-
-	APlayerControllerBase* PC1 = Player1Pawn ? Cast<APlayerControllerBase>(Player1Pawn->GetController()) : nullptr;
-	APlayerControllerBase* PC2 = Player2Pawn ? Cast<APlayerControllerBase>(Player2Pawn->GetController()) : nullptr;
-
-	bool bBothBound = true;
-
-	if (Respawn1 && PC2)
+	for (int32 PlayerIndex = 0; PlayerIndex < NumberOfLocalPlayers; ++PlayerIndex)
 	{
-		Respawn1->OnPlayerDied.AddUniqueDynamic(PC2, &APlayerControllerBase::NotifyOpponentDied);
-	}
-	else
-	{
-		bBothBound = false;
+		APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, PlayerIndex);
+		URespawnComponent* Respawn = PlayerPawn ? PlayerPawn->FindComponentByClass<URespawnComponent>() : nullptr;
+
+		if (!Respawn)
+		{
+			bAllBound = false;
+			continue;
+		}
+
+		for (int32 OtherIndex = 0; OtherIndex < NumberOfLocalPlayers; ++OtherIndex)
+		{
+			if (OtherIndex == PlayerIndex)
+			{
+				continue;
+			}
+
+			APawn* OtherPawn = UGameplayStatics::GetPlayerPawn(this, OtherIndex);
+			APlayerControllerBase* OtherPC = OtherPawn ? Cast<APlayerControllerBase>(OtherPawn->GetController()) : nullptr;
+			if (!OtherPC)
+			{
+				bAllBound = false;
+				continue;
+			}
+
+			Respawn->OnPlayerDied.AddUniqueDynamic(OtherPC, &APlayerControllerBase::NotifyOpponentDied);
+		}
 	}
 
-	if (Respawn2 && PC1)
-	{
-		Respawn2->OnPlayerDied.AddUniqueDynamic(PC1, &APlayerControllerBase::NotifyOpponentDied);
-	}
-	else
-	{
-		bBothBound = false;
-	}
-
-	if (!bBothBound)
+	if (!bAllBound)
 	{
 		GetWorldTimerManager().SetTimer(BindRespawnEventsRetryHandle, this, &AGameModeGMTK::BindPlayerRespawnEvents, 0.2f, false);
 	}
@@ -121,6 +127,16 @@ void AGameModeGMTK::HandlePlayer2TimerExpired()
 	HandleGameOver(1);
 }
 
+void AGameModeGMTK::HandlePlayer3TimerExpired()
+{
+	HandleGameOver(2);
+}
+
+void AGameModeGMTK::HandlePlayer4TimerExpired()
+{
+	HandleGameOver(3);
+}
+
 void AGameModeGMTK::HandleGameOver(int32 LosingPlayerIndex)
 {
 	if (bGameOverTriggered || !GameOverStateClass)
@@ -129,7 +145,8 @@ void AGameModeGMTK::HandleGameOver(int32 LosingPlayerIndex)
 	}
 
 	bGameOverTriggered = true;
-	PendingWinningPlayerIndex = (LosingPlayerIndex == 0) ? 1 : 0;
+
+	PendingWinningPlayerIndex = (NumberOfLocalPlayers == 2) ? ((LosingPlayerIndex == 0) ? 1 : 0) : -1;
 
 	APawn* LosingPawn = UGameplayStatics::GetPlayerPawn(this, LosingPlayerIndex);
 	if (LosingPawn)

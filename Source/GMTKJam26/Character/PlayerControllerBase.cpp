@@ -2,6 +2,7 @@
 #include "PlayerCharacter.h"
 #include "Camera/TopDownCameraActor.h"
 #include "UI/PlayerTimerWidget.h"
+#include "Components/CanvasPanelSlot.h"
 #include "Components/PlayerTimerComponent.h"
 #include "Components/PushComponent.h"
 #include "Components/DashComponent.h"
@@ -218,12 +219,28 @@ void APlayerControllerBase::OnPossess(APawn* InPawn)
 						PlayerIndex = (FoundIndex != INDEX_NONE) ? FoundIndex : 0;
 					}
 				}
-				const bool bIsFirstPlayer = (PlayerIndex == 0);
+				FAnchors WidgetAnchors(0.f, 0.f);
 
-				TimerWidget->SetAnchorsInViewport(bIsFirstPlayer ? FAnchors(0.f, 0.f) : FAnchors(1.f, 0.f));
-				TimerWidget->SetAlignmentInViewport(bIsFirstPlayer ? FVector2D(0.f, 0.f) : FVector2D(1.f, 0.f));
+				switch (PlayerIndex)
+				{
+				case 0: WidgetAnchors = FAnchors(0.f, 0.f); break;
+				case 1: WidgetAnchors = FAnchors(1.f, 0.f); break;
+				case 2: WidgetAnchors = FAnchors(0.f, 1.f); break;
+				case 3: WidgetAnchors = FAnchors(1.f, 1.f); break;
+				default: break;
+				}
 
-				if (bIsFirstPlayer)
+				const bool bMirrorWidget = (WidgetAnchors.Minimum.X == 0.f);
+
+				TimerWidget->SetAnchorsInViewport(WidgetAnchors);
+				TimerWidget->SetAlignmentInViewport(FVector2D(WidgetAnchors.Minimum.X, WidgetAnchors.Minimum.Y));
+
+				if (UCanvasPanelSlot* ViewportSlot = Cast<UCanvasPanelSlot>(TimerWidget->Slot))
+				{
+					ViewportSlot->SetAutoSize(true);
+				}
+
+				if (bMirrorWidget)
 				{
 					TimerWidget->SetRenderScale(FVector2D(-1.f, 1.f));
 				}

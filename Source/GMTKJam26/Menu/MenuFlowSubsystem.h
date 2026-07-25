@@ -39,9 +39,16 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Menu Flow")
 	int32 GetGameOverWinnerIndex() const { return WinningPlayerIndex; }
 
+	UFUNCTION(BlueprintCallable, Category = "Menu Flow")
+	void SetDesiredPlayerCount(int32 InPlayerCount) { DesiredPlayerCount = FMath::Clamp(InPlayerCount, 1, 4); }
+
+	UFUNCTION(BlueprintPure, Category = "Menu Flow")
+	int32 GetDesiredPlayerCount() const { return DesiredPlayerCount; }
+
 private:
 	UPROPERTY()
 	TArray<TObjectPtr<UMenuStateBase>> StateStack;
 
 	int32 WinningPlayerIndex = -1;
+	int32 DesiredPlayerCount = 2;
 };

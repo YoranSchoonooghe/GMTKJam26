@@ -47,6 +47,12 @@ private:
 	UFUNCTION()
 	void HandlePlayer2TimerExpired();
 
+	UFUNCTION()
+	void HandlePlayer3TimerExpired();
+
+	UFUNCTION()
+	void HandlePlayer4TimerExpired();
+
 	void HandleGameOver(int32 LosingPlayerIndex);
 	void ShowGameOverMenu();
 	void ExplodeRobotParts(int32 LosingPlayerIndex);
