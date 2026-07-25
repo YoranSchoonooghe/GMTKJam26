@@ -29,8 +29,11 @@ protected:
 	TObjectPtr<UStaticMeshComponent> StairMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Falling Stair")
+	bool bCanFall{ true };
+
+	UPROPERTY(EditAnywhere, Category = "Falling Stair", meta = (EditCondition="bCanFall"))
 	float TimeToFall{ 5.0f };
-	UPROPERTY(EditAnywhere, Category = "Falling Stair")
+	UPROPERTY(EditAnywhere, Category = "Falling Stair", meta = (EditCondition = "bCanFall"))
 	float FallDistance{ 1000.0f };
 
 	UPROPERTY(EditAnywhere, Category = "Falling Stair")

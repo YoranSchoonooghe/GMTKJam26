@@ -55,7 +55,7 @@ void AFallingStair::UpdateIdleState(float DeltaTime)
 {
 	_elapsedTimeInState += DeltaTime;
 
-	if (_elapsedTimeInState >= TimeToFall)
+	if (_elapsedTimeInState >= TimeToFall && bCanFall)
 	{
 		_elapsedTimeInState = 0.0f;
 		_state = EStairState::Shaking;
