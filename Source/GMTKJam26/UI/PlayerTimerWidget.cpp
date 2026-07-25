@@ -84,7 +84,7 @@ void UPlayerTimerWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTi
 	{
 		if (SegmentWidgets[Index])
 		{
-			SegmentWidgets[Index]->UpdateSegment(Segments[Index], Index == ActiveIndex);
+			SegmentWidgets[Index]->UpdateSegment(Segments[Index], Index == ActiveIndex, InDeltaTime);
 		}
 	}
 }

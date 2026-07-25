@@ -2,6 +2,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Engine/Texture2D.h"
+#include "Animation/WidgetAnimation.h"
 
 void UTimerSegmentWidget::SetVisual(const FText& InDisplayName, UTexture2D* InFillIcon, UTexture2D* InBackgroundIcon, const FVector2D& InOffset)
 {
@@ -51,7 +52,7 @@ void UTimerSegmentWidget::ApplyVisual()
 	}
 }
 
-void UTimerSegmentWidget::UpdateSegment(const FTimerSegment& Segment, bool bIsActive)
+void UTimerSegmentWidget::UpdateSegment(const FTimerSegment& Segment, bool bIsActive, float DeltaTime)
 {
 	const float Percent = Segment.MaxDuration > 0.f ? FMath::Clamp(Segment.RemainingTime / Segment.MaxDuration, 0.f, 1.f) : 0.f;
 
@@ -64,4 +65,37 @@ void UTimerSegmentWidget::UpdateSegment(const FTimerSegment& Segment, bool bIsAc
 	{
 		TimeLabel->SetText(Segment.bIsDelivered ? FText::AsNumber(FMath::CeilToInt(Segment.RemainingTime)) : FText::FromString(TEXT("--")));
 	}
+
+	if (bIsActive && !bWasActive && PopInAnim)
+	{
+		PlayAnimation(PopInAnim);
+	}
+
+	if (bHasPreviousRemainingTime && PopLostAnim && (PreviousRemainingTime - Segment.RemainingTime) > LostTimeJumpThreshold)
+	{
+		PlayAnimation(PopLostAnim);
+	}
+
+	const bool bShouldShake = bIsActive && Segment.bIsDelivered && LowTimeShakeThreshold > 0.f && Segment.RemainingTime < LowTimeShakeThreshold;
+
+	if (bShouldShake)
+	{
+		const float ShakeAlpha = FMath::Clamp(1.f - (Segment.RemainingTime / LowTimeShakeThreshold), 0.f, 1.f);
+		const float Frequency = FMath::Lerp(MinLowTimeShakeFrequency, MaxLowTimeShakeFrequency, ShakeAlpha);
+
+		ShakePhase += DeltaTime * Frequency;
+		const float ShakeAngle = FMath::Sin(ShakePhase) * MaxLowTimeShakeAngle * ShakeAlpha;
+
+		SetRenderTransformAngle(ShakeAngle);
+	}
+	else if (bWasShaking)
+	{
+		ShakePhase = 0.f;
+		SetRenderTransformAngle(0.f);
+	}
+
+	bWasShaking = bShouldShake;
+	bWasActive = bIsActive;
+	PreviousRemainingTime = Segment.RemainingTime;
+	bHasPreviousRemainingTime = true;
 }
