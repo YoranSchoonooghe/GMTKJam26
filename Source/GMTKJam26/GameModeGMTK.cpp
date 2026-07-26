@@ -25,6 +25,12 @@ void AGameModeGMTK::BeginPlay()
 			NumberOfLocalPlayers = MenuFlow->GetDesiredPlayerCount();
 		}
 
+		while (GameInstance->GetNumLocalPlayers() > NumberOfLocalPlayers)
+		{
+			const TArray<ULocalPlayer*>& CurrentLocalPlayers = GameInstance->GetLocalPlayers();
+			GameInstance->RemoveLocalPlayer(CurrentLocalPlayers.Last());
+		}
+
 		while (GameInstance->GetNumLocalPlayers() < NumberOfLocalPlayers)
 		{
 			FString Error;
