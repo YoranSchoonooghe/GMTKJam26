@@ -40,7 +40,7 @@ public:
 	int32 GetGameOverWinnerIndex() const { return WinningPlayerIndex; }
 
 	UFUNCTION(BlueprintCallable, Category = "Menu Flow")
-	void SetDesiredPlayerCount(int32 InPlayerCount) { DesiredPlayerCount = FMath::Clamp(InPlayerCount, 1, 4); }
+	void SetDesiredPlayerCount(int32 InPlayerCount) { DesiredPlayerCount = FMath::Clamp(InPlayerCount, 2, 4); }
 
 	UFUNCTION(BlueprintPure, Category = "Menu Flow")
 	int32 GetDesiredPlayerCount() const { return DesiredPlayerCount; }

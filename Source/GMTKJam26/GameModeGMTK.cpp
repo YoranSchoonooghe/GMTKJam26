@@ -10,6 +10,8 @@
 #include "Menu/States/MenuStateBase.h"
 #include "Character/PlayerControllerBase.h"
 #include "Interaction/ItemPlacementActor.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 void AGameModeGMTK::BeginPlay()
 {
@@ -139,18 +141,28 @@ void AGameModeGMTK::HandlePlayer4TimerExpired()
 
 void AGameModeGMTK::HandleGameOver(int32 LosingPlayerIndex)
 {
-	if (bGameOverTriggered || !GameOverStateClass)
+	if (bGameOverTriggered || !GameOverStateClass || EliminatedPlayers.Contains(LosingPlayerIndex))
 	{
 		return;
 	}
 
-	bGameOverTriggered = true;
-
-	PendingWinningPlayerIndex = (NumberOfLocalPlayers == 2) ? ((LosingPlayerIndex == 0) ? 1 : 0) : -1;
+	EliminatedPlayers.Add(LosingPlayerIndex);
 
 	APawn* LosingPawn = UGameplayStatics::GetPlayerPawn(this, LosingPlayerIndex);
 	if (LosingPawn)
 	{
+		LosingPawn->SetActorHiddenInGame(true);
+		LosingPawn->SetActorEnableCollision(false);
+
+		if (ACharacter* LosingCharacter = Cast<ACharacter>(LosingPawn))
+		{
+			if (UCharacterMovementComponent* Movement = LosingCharacter->GetCharacterMovement())
+			{
+				Movement->StopMovementImmediately();
+				Movement->DisableMovement();
+			}
+		}
+
 		if (AController* LosingController = LosingPawn->GetController())
 		{
 			LosingController->UnPossess();
@@ -160,6 +172,25 @@ void AGameModeGMTK::HandleGameOver(int32 LosingPlayerIndex)
 	OnGameOverSequenceStarted.Broadcast(LosingPawn, LosingPlayerIndex);
 
 	ExplodeRobotParts(LosingPlayerIndex);
+
+	int32 RemainingPlayerIndex = INDEX_NONE;
+	int32 RemainingCount = 0;
+	for (int32 PlayerIndex = 0; PlayerIndex < NumberOfLocalPlayers; ++PlayerIndex)
+	{
+		if (!EliminatedPlayers.Contains(PlayerIndex))
+		{
+			++RemainingCount;
+			RemainingPlayerIndex = PlayerIndex;
+		}
+	}
+
+	if (RemainingCount > 1)
+	{
+		return;
+	}
+
+	bGameOverTriggered = true;
+	PendingWinningPlayerIndex = RemainingPlayerIndex;
 
 	GetWorldTimerManager().SetTimer(GameOverDelayTimerHandle, this, &AGameModeGMTK::ShowGameOverMenu, GameOverDelaySeconds, false);
 }

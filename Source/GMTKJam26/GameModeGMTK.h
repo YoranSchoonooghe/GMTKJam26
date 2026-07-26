@@ -61,6 +61,8 @@ private:
 	int32 PendingWinningPlayerIndex = -1;
 	bool bGameOverTriggered = false;
 
+	TSet<int32> EliminatedPlayers;
+
 	FTimerHandle BindTimerEventsRetryHandle;
 	FTimerHandle BindRespawnEventsRetryHandle;
 	FTimerHandle GameOverDelayTimerHandle;
