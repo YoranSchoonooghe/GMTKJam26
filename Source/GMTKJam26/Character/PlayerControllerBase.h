@@ -66,6 +66,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> InteractAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> MoveP2Action;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> JumpP2Action;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> DashP2Action;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> InteractP2Action;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Rumble")
 	TObjectPtr<UForceFeedbackEffect> KnockbackRumbleEffect;
 
@@ -107,6 +119,12 @@ private:
 	void StartInteract();
 	void RequestPauseToggle();
 
+	void MoveP2(const FInputActionValue& Value);
+	void StartJumpP2();
+	void StopJumpP2();
+	void StartDashP2();
+	void StartInteractP2();
+
 	UFUNCTION()
 	void HandleKnockbackRumble(FVector SourceLocation);
 
@@ -131,8 +149,14 @@ private:
 	UFUNCTION()
 	void HandlePlayerLandedRumble(const FHitResult& Hit);
 
+	UFUNCTION()
+	void CacheSecondPlayerController();
+
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> ControlledCharacter;
+
+	UPROPERTY()
+	TObjectPtr<APlayerControllerBase> SecondPlayerController;
 
 	UPROPERTY()
 	TObjectPtr<UPlayerTimerWidget> TimerWidget;
