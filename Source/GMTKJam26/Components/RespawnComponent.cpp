@@ -87,6 +87,19 @@ void URespawnComponent::HandleFallIntoVoid()
 	GetWorld()->GetSubsystem<UEventBusSubsystem>()->SendEvent("OnPlayerDied");
 }
 
+void URespawnComponent::CancelPendingRespawn()
+{
+	bIsDead = true;
+
+	GetWorld()->GetTimerManager().ClearTimer(RespawnTimerHandle);
+
+	if (CountdownWidget)
+	{
+		CountdownWidget->RemoveFromParent();
+		CountdownWidget = nullptr;
+	}
+}
+
 void URespawnComponent::Respawn()
 {
 	if (!OwningCharacter.IsValid())

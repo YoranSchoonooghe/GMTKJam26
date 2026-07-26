@@ -47,6 +47,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Timer")
 	void ApplyDeathPenalty();
 
+	UFUNCTION(BlueprintCallable, Category = "Timer")
+	void SetTimeScale(float NewTimeScale) { TimeScale = FMath::Max(NewTimeScale, 0.f); }
+
 	UFUNCTION(BlueprintPure, Category = "Timer")
 	TArray<FTimerSegment> GetSegments() const { return Segments; }
 
@@ -83,4 +86,5 @@ private:
 	TArray<FTimerSegment> Segments;
 
 	bool bExpired = false;
+	float TimeScale = 1.f;
 };

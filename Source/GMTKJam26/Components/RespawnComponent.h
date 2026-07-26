@@ -25,6 +25,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Respawn")
 	void HandleFallIntoVoid();
 
+	UFUNCTION(BlueprintCallable, Category = "Respawn")
+	void CancelPendingRespawn();
+
 	UPROPERTY(BlueprintAssignable, Category = "Respawn|Events")
 	FOnPlayerDiedSignature OnPlayerDied;
 

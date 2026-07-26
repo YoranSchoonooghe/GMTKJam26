@@ -11,6 +11,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGameOverSequenceStartedSignature
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameOverSequenceEndedSignature, int32, WinningPlayerIndex);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMatchWonSignature, int32, WinningPlayerIndex);
+
 UCLASS()
 class GMTKJAM26_API AGameModeGMTK : public AGameModeBase
 {
@@ -22,6 +24,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "GameOver")
 	FOnGameOverSequenceEndedSignature OnGameOverSequenceEnded;
+
+	UPROPERTY(BlueprintAssignable, Category = "GameOver")
+	FOnMatchWonSignature OnMatchWon;
 
 protected:
 	virtual void BeginPlay() override;

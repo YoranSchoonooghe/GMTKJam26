@@ -48,7 +48,7 @@ void UPlayerTimerComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	}
 
 	FTimerSegment& ActiveSegment = Segments[ActiveIndex];
-	ActiveSegment.RemainingTime = FMath::Max(ActiveSegment.RemainingTime - DeltaTime, 0.f);
+	ActiveSegment.RemainingTime = FMath::Max(ActiveSegment.RemainingTime - DeltaTime * TimeScale, 0.f);
 
 	if (ActiveSegment.RemainingTime <= 0.f)
 	{

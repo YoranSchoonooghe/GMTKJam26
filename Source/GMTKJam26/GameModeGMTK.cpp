@@ -152,9 +152,6 @@ void AGameModeGMTK::HandleGameOver(int32 LosingPlayerIndex)
 	APawn* LosingPawn = UGameplayStatics::GetPlayerPawn(this, LosingPlayerIndex);
 	if (LosingPawn)
 	{
-		LosingPawn->SetActorHiddenInGame(true);
-		LosingPawn->SetActorEnableCollision(false);
-
 		if (ACharacter* LosingCharacter = Cast<ACharacter>(LosingPawn))
 		{
 			if (UCharacterMovementComponent* Movement = LosingCharacter->GetCharacterMovement())
@@ -162,6 +159,11 @@ void AGameModeGMTK::HandleGameOver(int32 LosingPlayerIndex)
 				Movement->StopMovementImmediately();
 				Movement->DisableMovement();
 			}
+		}
+
+		if (URespawnComponent* Respawn = LosingPawn->FindComponentByClass<URespawnComponent>())
+		{
+			Respawn->CancelPendingRespawn();
 		}
 
 		if (AController* LosingController = LosingPawn->GetController())
@@ -187,11 +189,30 @@ void AGameModeGMTK::HandleGameOver(int32 LosingPlayerIndex)
 
 	if (RemainingCount > 1)
 	{
+		if (NumberOfLocalPlayers > 2 && EliminatedPlayers.Num() == 1)
+		{
+			for (int32 PlayerIndex = 0; PlayerIndex < NumberOfLocalPlayers; ++PlayerIndex)
+			{
+				if (EliminatedPlayers.Contains(PlayerIndex))
+				{
+					continue;
+				}
+
+				APawn* SurvivingPawn = UGameplayStatics::GetPlayerPawn(this, PlayerIndex);
+				if (UPlayerTimerComponent* Timer = SurvivingPawn ? SurvivingPawn->FindComponentByClass<UPlayerTimerComponent>() : nullptr)
+				{
+					Timer->SetTimeScale(2.f);
+				}
+			}
+		}
+
 		return;
 	}
 
 	bGameOverTriggered = true;
 	PendingWinningPlayerIndex = RemainingPlayerIndex;
+
+	OnMatchWon.Broadcast(RemainingPlayerIndex);
 
 	GetWorldTimerManager().SetTimer(GameOverDelayTimerHandle, this, &AGameModeGMTK::ShowGameOverMenu, GameOverDelaySeconds, false);
 }
