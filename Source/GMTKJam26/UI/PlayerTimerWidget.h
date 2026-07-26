@@ -28,6 +28,13 @@ struct FTimerSegmentVisual
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Timer")
 	FVector2D Offset = FVector2D::ZeroVector;
+
+	// Remaps the bar's 0-1 fill percent into this range, so the visible fill never goes below/above these bounds.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Timer", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float MinFillPercent = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Timer", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float MaxFillPercent = 1.f;
 };
 
 

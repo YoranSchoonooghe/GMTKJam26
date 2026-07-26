@@ -18,7 +18,7 @@ class GMTKJAM26_API UTimerSegmentWidget : public UUserWidget
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Timer")
-	void SetVisual(const FText& InDisplayName, UTexture2D* InFillIcon, UTexture2D* InBackgroundIcon, const FVector2D& InOffset);
+	void SetVisual(const FText& InDisplayName, UTexture2D* InFillIcon, UTexture2D* InBackgroundIcon, const FVector2D& InOffset, float InMinFillPercent = 0.f, float InMaxFillPercent = 1.f);
 
 	UFUNCTION(BlueprintCallable, Category = "Timer")
 	void UpdateSegment(const FTimerSegment& Segment, bool bIsActive, float DeltaTime);
@@ -68,6 +68,21 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Timer")
 	float MaxLowTimeShakeFrequency = 35.f;
 
+	// Remaps the bar's 0-1 fill percent into this range, so the visible fill never goes below/above these bounds.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Timer", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float MinFillPercent = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Timer", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float MaxFillPercent = 1.f;
+
+	// How fast the active segment breathes (scales up and down). Lower is slower.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Timer")
+	float ActivePulseSpeed = 2.f;
+
+	// How much the active segment scales up/down, as a fraction of its normal size.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Timer")
+	float ActivePulseScale = 0.05f;
+
 private:
 	void ApplyVisual();
 
@@ -76,4 +91,5 @@ private:
 	bool bHasPreviousRemainingTime = false;
 	float PreviousRemainingTime = 0.f;
 	float ShakePhase = 0.f;
+	float PulsePhase = 0.f;
 };

@@ -4,12 +4,14 @@
 #include "Engine/Texture2D.h"
 #include "Animation/WidgetAnimation.h"
 
-void UTimerSegmentWidget::SetVisual(const FText& InDisplayName, UTexture2D* InFillIcon, UTexture2D* InBackgroundIcon, const FVector2D& InOffset)
+void UTimerSegmentWidget::SetVisual(const FText& InDisplayName, UTexture2D* InFillIcon, UTexture2D* InBackgroundIcon, const FVector2D& InOffset, float InMinFillPercent, float InMaxFillPercent)
 {
 	DisplayName = InDisplayName;
 	FillIcon = InFillIcon;
 	BackgroundIcon = InBackgroundIcon;
 	Offset = InOffset;
+	MinFillPercent = InMinFillPercent;
+	MaxFillPercent = InMaxFillPercent;
 
 	ApplyVisual();
 }
@@ -58,7 +60,7 @@ void UTimerSegmentWidget::UpdateSegment(const FTimerSegment& Segment, bool bIsAc
 
 	if (TimeBar)
 	{
-		TimeBar->SetPercent(Percent);
+		TimeBar->SetPercent(FMath::Lerp(MinFillPercent, MaxFillPercent, Percent));
 	}
 
 	if (TimeLabel)
@@ -92,6 +94,18 @@ void UTimerSegmentWidget::UpdateSegment(const FTimerSegment& Segment, bool bIsAc
 	{
 		ShakePhase = 0.f;
 		SetRenderTransformAngle(0.f);
+	}
+
+	if (bIsActive)
+	{
+		PulsePhase += DeltaTime * ActivePulseSpeed;
+		const float PulseScale = 1.f + FMath::Sin(PulsePhase) * ActivePulseScale;
+		SetRenderScale(FVector2D(PulseScale, PulseScale));
+	}
+	else if (bWasActive)
+	{
+		PulsePhase = 0.f;
+		SetRenderScale(FVector2D(1.f, 1.f));
 	}
 
 	bWasShaking = bShouldShake;

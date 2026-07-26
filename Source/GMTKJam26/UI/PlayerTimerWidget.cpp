@@ -41,7 +41,7 @@ void UPlayerTimerWidget::BuildSegmentWidgets()
 			continue;
 		}
 
-		SegmentWidget->SetVisual(Visual.DisplayName, Visual.FillIcon, Visual.BackgroundIcon, Visual.Offset);
+		SegmentWidget->SetVisual(Visual.DisplayName, Visual.FillIcon, Visual.BackgroundIcon, Visual.Offset, Visual.MinFillPercent, Visual.MaxFillPercent);
 
 		if (Visual.bMirrorIcon)
 		{
