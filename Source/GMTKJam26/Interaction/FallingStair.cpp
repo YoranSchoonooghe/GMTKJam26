@@ -60,6 +60,8 @@ void AFallingStair::UpdateIdleState(float DeltaTime)
 		_elapsedTimeInState = 0.0f;
 		_state = EStairState::Shaking;
 
+		OnPlatformShake.Broadcast();
+
 		return;
 	}
 
@@ -79,6 +81,8 @@ void AFallingStair::UpdateShakingState(float DeltaTime)
 		_state = EStairState::Falling;
 
 		SetActorLocation(_startLocation);
+
+		OnPlatformDown.Broadcast();
 
 		return;
 	}
@@ -142,6 +146,8 @@ void AFallingStair::UpdateCooldownState(float DeltaTime)
 		_state = EStairState::Resetting;
 		_elapsedTimeInState = 0.0f;
 		_bIsResetTriggered = false;
+
+		OnPlatformUp.Broadcast();
 	}
 }
 

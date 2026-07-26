@@ -6,6 +6,7 @@
 
 class UStaticMeshComponent;
 class UBlobShadowComponent;
+class UWidgetComponent;
 
 UENUM(BlueprintType)
 enum class EInteractableItemState : uint8
@@ -58,6 +59,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
 	void SetHighlight(bool highlighted);
 
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	void SetPickupHintVisible(bool bVisible);
+
 	UPROPERTY(BlueprintAssignable, Category = "Interaction")
 	FOnItemLandedSignature OnLanded;
 	UPROPERTY(BlueprintAssignable, Category = "Interaction")
@@ -82,6 +86,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Blob Shadow", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UBlobShadowComponent> BlobShadowComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UWidgetComponent> PickupHintWidget;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Interaction")
 	TObjectPtr<UMaterialInterface> OutlineMaterial;

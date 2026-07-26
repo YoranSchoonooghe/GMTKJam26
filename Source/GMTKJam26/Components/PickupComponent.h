@@ -55,6 +55,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
 	float PickupCooldown = 0.5f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
+	int32 MaxHintShowCount = 3;
+
 	UFUNCTION()
 	void OnBeginOverlap(
 		UPrimitiveComponent* OverlappedComp,
@@ -90,4 +93,6 @@ private:
 	TObjectPtr<AInteractableItem> HeldItem;
 
 	FTimerHandle PickupCooldownTimerHandle;
+
+	int32 HintShowCount = 0;
 };

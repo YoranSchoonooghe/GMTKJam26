@@ -14,13 +14,26 @@ enum class EStairState : uint8
 	Resetting
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlatformShakeSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlatformDownSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlatformUpSignature);
+
 UCLASS()
 class GMTKJAM26_API AFallingStair : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	AFallingStair();
+
+	UPROPERTY(BlueprintAssignable, Category = "Falling Stair|Events")
+	FOnPlatformShakeSignature OnPlatformShake;
+
+	UPROPERTY(BlueprintAssignable, Category = "Falling Stair|Events")
+	FOnPlatformDownSignature OnPlatformDown;
+
+	UPROPERTY(BlueprintAssignable, Category = "Falling Stair|Events")
+	FOnPlatformUpSignature OnPlatformUp;
 
 protected:
 	virtual void BeginPlay() override;

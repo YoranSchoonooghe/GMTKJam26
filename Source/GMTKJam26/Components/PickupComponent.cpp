@@ -65,6 +65,8 @@ bool UPickupComponent::TryPickup()
 		if (HighlightedItem)
 		{
 			HighlightedItem->SetHighlight(false);
+			HighlightedItem->SetPickupHintVisible(false);
+			HighlightedItem = nullptr;
 		}
 
 		GetWorld()->GetTimerManager().SetTimer(PickupCooldownTimerHandle, PickupCooldown, false);
@@ -123,6 +125,7 @@ void UPickupComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		if (HighlightedItem)
 		{
 			HighlightedItem->SetHighlight(false);
+			HighlightedItem->SetPickupHintVisible(false);
 		}
 
 		HighlightedItem = closestItem;
@@ -130,6 +133,12 @@ void UPickupComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		if (HighlightedItem)
 		{
 			HighlightedItem->SetHighlight(true);
+
+			if (HintShowCount < MaxHintShowCount)
+			{
+				HighlightedItem->SetPickupHintVisible(true);
+				++HintShowCount;
+			}
 		}
 	}
 }

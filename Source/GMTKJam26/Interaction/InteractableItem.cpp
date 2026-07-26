@@ -3,6 +3,7 @@
 #include "GameFramework/Character.h"
 #include "Components/PushComponent.h"
 #include "Components/BlobShadowComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GMTKJam26/Character/PlayerControllerBase.h"
 #include "GMTKJam26/Events/EventBusSubsystem.h"
 
@@ -18,6 +19,12 @@ AInteractableItem::AInteractableItem()
 	Mesh->SetNotifyRigidBodyCollision(true);
 
 	BlobShadowComponent = CreateDefaultSubobject<UBlobShadowComponent>(TEXT("BlobShadowComponent"));
+
+	PickupHintWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickupHintWidget"));
+	PickupHintWidget->SetupAttachment(Mesh);
+	PickupHintWidget->SetRelativeLocation(FVector(0.f, 0.f, 75.f));
+	PickupHintWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	PickupHintWidget->SetHiddenInGame(true);
 }
 
 void AInteractableItem::BeginPlay()
@@ -116,6 +123,14 @@ void AInteractableItem::SetHighlight(bool highlighted)
 	else
 	{
 		Mesh->SetOverlayMaterial(nullptr);
+	}
+}
+
+void AInteractableItem::SetPickupHintVisible(bool bVisible)
+{
+	if (PickupHintWidget)
+	{
+		PickupHintWidget->SetHiddenInGame(!bVisible);
 	}
 }
 

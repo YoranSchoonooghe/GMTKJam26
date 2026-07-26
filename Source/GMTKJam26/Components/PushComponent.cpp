@@ -165,6 +165,8 @@ void UPushComponent::StartPunch()
 
 	bPunchWindowActive = true;
 
+	OnPunch.Broadcast();
+
 	const UCapsuleComponent* OwnerCapsule = OwningCharacter->GetCapsuleComponent();
 	const float Radius = (OwnerCapsule ? OwnerCapsule->GetScaledCapsuleRadius() : 34.f) + ZoneRadiusPadding;
 	const float HalfHeight = (OwnerCapsule ? OwnerCapsule->GetScaledCapsuleHalfHeight() : 88.f) + PunchZoneHalfHeightPadding;
