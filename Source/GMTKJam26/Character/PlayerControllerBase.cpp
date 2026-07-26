@@ -13,6 +13,7 @@
 #include "Menu/States/MenuStateBase.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/ForceFeedbackEffect.h"
 #include "GameFramework/ForceFeedbackParameters.h"
@@ -21,13 +22,7 @@ void APlayerControllerBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
-	{
-		if (DefaultMappingContext)
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
-	}
+	TryAddMappingContext();
 
 	if (AActor* StaticCamera = UGameplayStatics::GetActorOfClass(GetWorld(), ATopDownCameraActor::StaticClass()))
 	{
@@ -147,6 +142,21 @@ void APlayerControllerBase::CacheSecondPlayerController()
 	if (GetLocalPlayer() && GetLocalPlayer()->GetLocalPlayerIndex() == 0)
 	{
 		SecondPlayerController = Cast<APlayerControllerBase>(UGameplayStatics::GetPlayerController(GetWorld(), 1));
+	}
+}
+
+void APlayerControllerBase::TryAddMappingContext()
+{
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	if (!Subsystem)
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &APlayerControllerBase::TryAddMappingContext);
+		return;
+	}
+
+	if (DefaultMappingContext)
+	{
+		Subsystem->AddMappingContext(DefaultMappingContext, 0);
 	}
 }
 

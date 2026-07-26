@@ -152,6 +152,8 @@ private:
 	UFUNCTION()
 	void CacheSecondPlayerController();
 
+	void TryAddMappingContext();
+
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> ControlledCharacter;
 
