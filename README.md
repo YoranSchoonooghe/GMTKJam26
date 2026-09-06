@@ -14,7 +14,7 @@
 
 You just started the night shift, and it's already going wrong. Passengers board your bus one by one, and it's your job to check their ID against the passenger database, spot anything that doesn't add up, and decide whether to let them on or throw them off, before a face-stealing mimic slips past you wearing someone else's face.
 
-Built in Unreal Engine (C++) in six days for **Brackeys Game Jam 2026.2**.
+Built in Unreal Engine (C++) in six days for [Brackeys Game Jam 2026.2](https://itch.io/jam/brackeys-16).
 
 ## Screenshots
 
